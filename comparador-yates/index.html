@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
+<title>Comparador de Yates</title>
+<meta name="description" content="Compara el costo real de propiedad de tus yates: marinas, seguro, mantenimiento, tripulación y financiamiento.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   COMPARADOR DE YATES — luxury nautical ledger
+   Deep Atlantic navy · brass accents · chart-paper cards
+   ============================================================ */
+:root{
+  --navy-950:#081420;
+  --navy-900:#0B1D2C;
+  --navy-800:#122A3E;
+  --navy-700:#1B3A53;
+  --navy-600:#2A4D6A;
+  --ink:#152433;
+  --paper:#F7F2E7;
+  --paper-dim:#EFE8D8;
+  --paper-line:#E2D8C2;
+  --brass:#C2A15A;
+  --brass-bright:#E3C77F;
+  --brass-dim:#8F7845;
+  --foam:#EAF2F6;
+  --mist:#9DB4C4;
+  --sea-green:#2E7D64;
+  --sea-green-soft:#DFF0E7;
+  --coral:#C25B4A;
+  --coral-soft:#F6E3DF;
+  --shadow-lg:0 24px 60px -18px rgba(4,12,20,.55);
+  --shadow-md:0 10px 30px -12px rgba(4,12,20,.35);
+  --radius:14px;
+  --font-display:"Fraunces",Georgia,"Times New Roman",serif;
+  --font-body:"Instrument Sans",-apple-system,"Segoe UI",sans-serif;
+  --tabbar-h:64px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--font-body);
+  background:var(--navy-900);
+  color:var(--foam);
+  min-height:100vh;
+  padding-bottom:calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px) + 16px);
+}
+/* faint nautical chart grid over the deep water background */
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(1200px 500px at 80% -10%, rgba(194,161,90,.10), transparent 60%),
+    radial-gradient(900px 600px at -10% 110%, rgba(42,77,106,.35), transparent 60%),
+    repeating-linear-gradient(0deg, rgba(157,180,196,.045) 0 1px, transparent 1px 72px),
+    repeating-linear-gradient(90deg, rgba(157,180,196,.045) 0 1px, transparent 1px 72px);
+}
+main,header.app,nav.tabbar{position:relative;z-index:1}
+
+/* ---------- header ---------- */
+header.app{
+  max-width:1080px;margin:0 auto;padding:26px 20px 10px;
+  display:flex;align-items:flex-end;justify-content:space-between;gap:12px;
+}
+.brand h1{
+  font-family:var(--font-display);font-weight:600;font-size:clamp(26px,6vw,40px);
+  letter-spacing:.01em;color:var(--paper);line-height:1.05;
+}
+.brand h1 em{font-style:italic;color:var(--brass-bright)}
+.brand .tagline{
+  margin-top:6px;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--mist);
+}
+.brand .tagline::before{content:"⚓ ";color:var(--brass)}
+.header-actions{display:flex;gap:8px;flex-shrink:0}
+.icon-btn{
+  appearance:none;border:1px solid rgba(194,161,90,.4);background:rgba(194,161,90,.08);
+  color:var(--brass-bright);border-radius:10px;padding:9px 12px;font-family:var(--font-body);
+  font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;
+  transition:background .15s ease, transform .1s ease;
+}
+.icon-btn:hover{background:rgba(194,161,90,.18)}
+.icon-btn:active{transform:scale(.97)}
+
+/* ---------- tab bar (bottom on mobile, inline on desktop) ---------- */
+nav.tabbar{
+  position:fixed;left:0;right:0;bottom:0;height:calc(var(--tabbar-h) + env(safe-area-inset-bottom,0px));
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  background:rgba(8,20,32,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-top:1px solid rgba(194,161,90,.25);
+  display:flex;justify-content:center;gap:4px;z-index:50;
+}
+nav.tabbar button{
+  appearance:none;background:none;border:none;cursor:pointer;
+  flex:1;max-width:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  color:var(--mist);font-family:var(--font-body);font-size:11.5px;font-weight:600;letter-spacing:.05em;
+  padding-top:8px;
+}
+nav.tabbar button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.6}
+nav.tabbar button.active{color:var(--brass-bright)}
+nav.tabbar button.active::after{
+  content:"";width:22px;height:2px;border-radius:2px;background:var(--brass);margin-top:2px;
+}
+@media(min-width:900px){
+  body{padding-bottom:40px}
+  nav.tabbar{
+    position:static;height:auto;background:none;border:none;backdrop-filter:none;
+    max-width:1080px;margin:8px auto 0;padding:0 20px;justify-content:flex-start;gap:8px;
+  }
+  nav.tabbar button{
+    flex:none;max-width:none;flex-direction:row;gap:8px;font-size:14px;
+    padding:10px 18px;border-radius:999px;border:1px solid transparent;
+  }
+  nav.tabbar button.active{border-color:rgba(194,161,90,.5);background:rgba(194,161,90,.1)}
+  nav.tabbar button.active::after{display:none}
+}
+
+/* ---------- layout ---------- */
+main{max-width:1080px;margin:0 auto;padding:18px 20px 40px}
+.view{display:none;animation:rise .35s ease both}
+.view.active{display:block}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+.section-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:18px 0 12px}
+.section-head h2{
+  font-family:var(--font-display);font-weight:600;font-size:22px;color:var(--paper);
+}
+.section-head .sub{font-size:13px;color:var(--mist)}
+.rule{height:1px;background:linear-gradient(90deg,rgba(194,161,90,.6),rgba(194,161,90,0));margin:4px 0 14px}
+
+/* ---------- cards (chart-paper) ---------- */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.card{
+  background:var(--paper);color:var(--ink);border-radius:var(--radius);
+  padding:16px 16px 14px;box-shadow:var(--shadow-md);
+  border:1px solid rgba(21,36,51,.06);
+  position:relative;overflow:hidden;
+}
+.card::after{ /* subtle laid-paper texture */
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background:repeating-linear-gradient(0deg, rgba(21,36,51,.02) 0 1px, transparent 1px 26px);
+}
+.card h3{font-family:var(--font-display);font-weight:600;font-size:19px;line-height:1.15}
+.card .meta{font-size:12.5px;color:#5B6B7A;margin-top:2px}
+.card .figures{margin-top:12px;display:flex;flex-wrap:wrap;gap:8px 18px}
+.fig{min-width:86px}
+.fig .lbl{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#7C8A97}
+.fig .val{font-size:16px;font-weight:600;font-variant-numeric:tabular-nums}
+.fig .val small{font-size:11px;color:#7C8A97;font-weight:500}
+.card .actions{margin-top:14px;display:flex;gap:8px;position:relative;z-index:1}
+.chip-warn{
+  display:inline-block;margin-top:8px;font-size:11.5px;font-weight:600;color:var(--coral);
+  background:var(--coral-soft);border-radius:999px;padding:3px 10px;
+}
+.btn{
+  appearance:none;cursor:pointer;font-family:var(--font-body);font-weight:600;font-size:13px;
+  border-radius:9px;padding:8px 14px;border:1px solid transparent;
+  transition:transform .1s ease, filter .15s ease;
+}
+.btn:active{transform:scale(.97)}
+.btn-ghost{background:none;border-color:rgba(21,36,51,.25);color:var(--ink)}
+.btn-ghost:hover{background:rgba(21,36,51,.05)}
+.btn-danger{background:none;border-color:rgba(194,91,74,.4);color:var(--coral)}
+.btn-danger:hover{background:var(--coral-soft)}
+.btn-brass{
+  background:linear-gradient(140deg,var(--brass-bright),var(--brass));color:#241B08;
+  box-shadow:0 6px 18px -8px rgba(194,161,90,.7);border:none;font-size:14px;padding:11px 20px;
+}
+.btn-brass:hover{filter:brightness(1.05)}
+.add-row{margin:16px 0 6px;display:flex;justify-content:center}
+
+/* ---------- empty state ---------- */
+.empty{
+  border:1.5px dashed rgba(157,180,196,.4);border-radius:var(--radius);
+  padding:34px 20px;text-align:center;color:var(--mist);font-size:14.5px;line-height:1.55;
+}
+.empty b{color:var(--paper)}
+
+/* ---------- comparar ---------- */
+.marina-chips{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 16px}
+.marina-chips .chip{
+  appearance:none;cursor:pointer;font-family:var(--font-body);font-size:13px;font-weight:600;
+  border-radius:999px;padding:8px 15px;border:1px solid rgba(157,180,196,.35);
+  background:rgba(18,42,62,.6);color:var(--foam);transition:all .15s ease;
+}
+.marina-chips .chip.active{
+  background:linear-gradient(140deg,var(--brass-bright),var(--brass));color:#241B08;border-color:transparent;
+  box-shadow:0 6px 18px -8px rgba(194,161,90,.7);
+}
+.marina-chips .chip .r{font-weight:500;opacity:.75;font-size:12px}
+
+.table-wrap{
+  overflow-x:auto;border-radius:var(--radius);box-shadow:var(--shadow-lg);
+  background:var(--paper);-webkit-overflow-scrolling:touch;
+}
+table.ledger{border-collapse:separate;border-spacing:0;width:100%;min-width:560px;color:var(--ink)}
+table.ledger th,table.ledger td{
+  padding:11px 14px;font-size:13.5px;text-align:right;white-space:nowrap;
+  border-bottom:1px solid var(--paper-line);font-variant-numeric:tabular-nums;
+}
+table.ledger th{font-weight:600}
+table.ledger thead th{
+  background:var(--navy-800);color:var(--paper);font-family:var(--font-display);
+  font-size:15px;letter-spacing:.02em;position:sticky;top:0;
+}
+table.ledger thead th .sub{display:block;font-family:var(--font-body);font-size:11px;color:var(--mist);font-weight:500;margin-top:2px}
+table.ledger thead th .flag{display:inline-block;font-family:var(--font-body);font-size:10px;font-weight:700;letter-spacing:.06em;color:var(--coral);background:rgba(246,227,223,.95);border-radius:999px;padding:2px 8px;margin-top:4px}
+table.ledger td:first-child, table.ledger th:first-child{
+  text-align:left;position:sticky;left:0;background:var(--paper);z-index:2;
+  border-right:1px solid var(--paper-line);max-width:190px;white-space:normal;
+}
+table.ledger thead th:first-child{background:var(--navy-800);z-index:3}
+table.ledger td:first-child .lbl{font-weight:600}
+table.ledger td:first-child .note{display:block;font-size:11px;color:#7C8A97;font-weight:400}
+table.ledger tr.total td{
+  background:var(--paper-dim);font-weight:700;font-size:14.5px;
+  border-top:2px solid var(--brass);border-bottom:none;
+}
+table.ledger tr.fraction td{background:rgba(46,125,100,.07);font-weight:600}
+table.ledger tr.total td:first-child{background:var(--paper-dim)}
+table.ledger tr.fraction td:first-child{background:#EBF0E7}
+table.ledger td.best{color:var(--sea-green);font-weight:700;position:relative}
+table.ledger td.best::before{content:"◆ ";font-size:9px;vertical-align:2px}
+table.ledger td.na{color:#A9B4BE}
+.badge-best{
+  display:inline-block;font-family:var(--font-body);font-size:10px;font-weight:700;letter-spacing:.06em;
+  color:#0E3A2C;background:var(--sea-green-soft);border-radius:999px;padding:2px 8px;margin-top:4px;
+}
+
+/* bar chart */
+.chart{background:var(--paper);border-radius:var(--radius);box-shadow:var(--shadow-md);padding:18px;color:var(--ink);margin-top:16px}
+.chart h3{font-family:var(--font-display);font-size:17px;margin-bottom:12px}
+.bar-row{display:grid;grid-template-columns:minmax(90px,150px) 1fr auto;gap:10px;align-items:center;margin:7px 0}
+.bar-row .name{font-size:12.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-track{background:rgba(21,36,51,.07);border-radius:6px;height:22px;overflow:hidden}
+.bar-fill{
+  height:100%;border-radius:6px;min-width:3px;
+  background:linear-gradient(90deg,var(--navy-700),var(--navy-600));
+  transition:width .6s cubic-bezier(.2,.8,.2,1);
+}
+.bar-row.best .bar-fill{background:linear-gradient(90deg,#2E7D64,#3E9B7D)}
+.bar-row.pending .bar-fill{background:repeating-linear-gradient(135deg,#B9C2CB 0 6px,#CBD3DA 6px 12px)}
+.bar-row .pend{display:block;font-size:10px;font-weight:700;letter-spacing:.03em;color:var(--coral)}
+.bar-row .amt{font-size:12.5px;font-weight:700;font-variant-numeric:tabular-nums}
+.hint{font-size:12.5px;color:var(--mist);margin-top:10px;line-height:1.5}
+.hint-paper{font-size:12px;color:#7C8A97;padding:10px 14px 12px;line-height:1.5}
+
+/* ---------- dialogs / forms ---------- */
+dialog{
+  border:none;border-radius:18px 18px 0 0;width:100%;max-width:640px;
+  background:var(--paper);color:var(--ink);box-shadow:var(--shadow-lg);
+  margin:auto auto 0;padding:0;
+}
+@media(min-width:640px){dialog{border-radius:18px;margin:auto}}
+dialog::backdrop{background:rgba(4,12,20,.65);backdrop-filter:blur(3px)}
+body:has(dialog[open]){overflow:hidden}
+.dlg-head{
+  padding:18px 20px 12px;border-bottom:1px solid var(--paper-line);
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;background:var(--paper);z-index:2;
+}
+.dlg-head h3{font-family:var(--font-display);font-size:21px;font-weight:600}
+.dlg-close{appearance:none;border:none;background:none;font-size:22px;line-height:1;cursor:pointer;color:#7C8A97;padding:4px 8px}
+.dlg-body{padding:16px 20px 8px;max-height:70vh;overflow-y:auto;overscroll-behavior:contain}
+.dlg-foot{
+  padding:14px 20px calc(16px + env(safe-area-inset-bottom,0px));
+  display:flex;gap:10px;justify-content:flex-end;border-top:1px solid var(--paper-line);
+  position:sticky;bottom:0;background:var(--paper);
+}
+fieldset{border:none;margin-bottom:14px}
+fieldset legend{
+  font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--brass-dim);margin-bottom:8px;
+}
+.frm-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.frm-grid .full{grid-column:1/-1}
+label.fld{display:block}
+label.fld .cap{font-size:12.5px;font-weight:600;margin-bottom:4px;display:block}
+label.fld .cap small{font-weight:400;color:#7C8A97}
+.fld input[type=text],.fld input[type=number],.fld select{
+  width:100%;padding:11px 12px;font-size:16px;font-family:var(--font-body);
+  border:1px solid rgba(21,36,51,.22);border-radius:9px;background:#FFFDF8;color:var(--ink);
+}
+.fld input:focus,.fld select:focus{outline:2px solid var(--brass);outline-offset:1px;border-color:var(--brass)}
+.check-line{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:600;margin:2px 0 10px;cursor:pointer}
+.check-line input{width:19px;height:19px;accent-color:var(--brass-dim)}
+.fin-fields.disabled{opacity:.4;pointer-events:none}
+.form-hint{font-size:12px;color:#7C8A97;margin-top:4px;line-height:1.45}
+
+/* datos dialog */
+.data-actions{display:flex;flex-direction:column;gap:10px;padding:4px 0 14px}
+.data-actions .btn{width:100%;text-align:center;padding:13px}
+.muted-note{font-size:12.5px;color:#7C8A97;line-height:1.5;margin-top:4px}
+
+/* ---------- print (siempre imprime la vista Comparar, en horizontal) ---------- */
+@media print{
+  @page{size:landscape;margin:10mm}
+  body{background:#fff;color:#111;padding:0}
+  body::before,header.app .header-actions,nav.tabbar,.add-row,.card .actions,.marina-chips{display:none!important}
+  .view{display:none!important}
+  #view-comparar{display:block!important;animation:none}
+  header.app{padding:6px 0}
+  .brand h1,.brand h1 em{color:#111}
+  .brand .tagline{color:#555}
+  main{padding:0;max-width:none}
+  .table-wrap,.chart,.card{box-shadow:none;border:1px solid #ccc}
+  .section-head h2{color:#111}
+  .section-head .sub,.hint{color:#555}
+  /* la tabla no puede desplazarse en papel: sin overflow, celdas que envuelven, texto compacto */
+  .table-wrap{overflow:visible}
+  table.ledger{min-width:0;width:100%}
+  table.ledger th,table.ledger td{white-space:normal;padding:5px 7px;font-size:10px}
+  table.ledger thead th{position:static;font-size:11px}
+  table.ledger td:first-child,table.ledger th:first-child{position:static}
+  table.ledger thead th{background:#eee!important;color:#111!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  table.ledger tr.total td,table.ledger tr.fraction td{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .chart{break-inside:avoid}
+  .bar-track,.bar-fill{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .bar-fill{border:.5px solid #1B3A53}
+}
+</style>
+</head>
+<body>
+
+<header class="app">
+  <div class="brand">
+    <h1>Comparador <em>de Yates</em></h1>
+    <div class="tagline">Costo real de propiedad · marina por marina</div>
+  </div>
+  <div class="header-actions">
+    <button class="icon-btn" id="btn-print" title="Imprimir o guardar PDF">🖨 PDF</button>
+    <button class="icon-btn" id="btn-datos">⛁ Datos</button>
+  </div>
+</header>
+
+<nav class="tabbar" id="tabbar">
+  <button data-view="comparar" class="active">
+    <svg viewBox="0 0 24 24"><path d="M3 17h18M6 17V9m6 8V5m6 12v-6"/></svg>
+    Comparar
+  </button>
+  <button data-view="barcos">
+    <svg viewBox="0 0 24 24"><path d="M4 15l8-3 8 3-2.2 4H6.2L4 15zM12 12V4m0 0l5 5m-5-5L7 9"/></svg>
+    Barcos
+  </button>
+  <button data-view="marinas">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><path d="M12 7v13m0 0C7 20 4 16.5 4 13m8 7c5 0 8-3.5 8-7M4 13H2m2 0h2m14 0h2m-4 0h2"/></svg>
+    Marinas
+  </button>
+</nav>
+
+<main>
+
+  <!-- ============ COMPARAR ============ -->
+  <section class="view active" id="view-comparar">
+    <div class="section-head">
+      <h2>Comparativa de propiedad</h2>
+      <span class="sub" id="comparar-sub"></span>
+    </div>
+    <div class="rule"></div>
+    <div class="marina-chips" id="marina-chips"></div>
+    <div id="comparar-body"></div>
+  </section>
+
+  <!-- ============ BARCOS ============ -->
+  <section class="view" id="view-barcos">
+    <div class="section-head">
+      <h2>Barcos</h2>
+      <span class="sub" id="barcos-count"></span>
+    </div>
+    <div class="rule"></div>
+    <div class="card-grid" id="barcos-grid"></div>
+    <div class="add-row"><button class="btn btn-brass" id="btn-add-barco">＋ Agregar barco</button></div>
+  </section>
+
+  <!-- ============ MARINAS ============ -->
+  <section class="view" id="view-marinas">
+    <div class="section-head">
+      <h2>Marinas</h2>
+      <span class="sub" id="marinas-count"></span>
+    </div>
+    <div class="rule"></div>
+    <div class="card-grid" id="marinas-grid"></div>
+    <div class="add-row"><button class="btn btn-brass" id="btn-add-marina">＋ Agregar marina</button></div>
+  </section>
+
+</main>
+
+<!-- ============ DIALOGO: BARCO ============ -->
+<dialog id="dlg-barco">
+  <form method="dialog" id="frm-barco">
+    <div class="dlg-head"><h3 id="dlg-barco-title">Agregar barco</h3><button type="button" class="dlg-close" data-close="dlg-barco">✕</button></div>
+    <div class="dlg-body">
+      <fieldset>
+        <legend>Datos del barco</legend>
+        <div class="frm-grid">
+          <label class="fld full"><span class="cap">Nombre / modelo</span>
+            <input type="text" id="b-nombre" required placeholder="Ej. Sanlorenzo SL90A">
+          </label>
+          <label class="fld"><span class="cap">Eslora <small>(pies)</small></span>
+            <input type="number" id="b-eslora" required min="1" step="any" inputmode="decimal" placeholder="90">
+          </label>
+          <label class="fld"><span class="cap">Precio <small>(USD)</small></span>
+            <input type="number" id="b-precio" min="0" step="any" inputmode="numeric" placeholder="0">
+          </label>
+        </div>
+        <p class="form-hint" id="b-eslora-hint"></p>
+      </fieldset>
+      <fieldset>
+        <legend>Costos anuales de operación</legend>
+        <div class="frm-grid">
+          <label class="fld"><span class="cap">Seguro <small>(% del valor / año)</small></span>
+            <input type="number" id="b-seguro" min="0" step="any" inputmode="decimal" value="1.5">
+          </label>
+          <label class="fld"><span class="cap">Mantenimiento <small>(% del valor / año)</small></span>
+            <input type="number" id="b-mant" min="0" step="any" inputmode="decimal" value="10">
+          </label>
+          <label class="fld"><span class="cap">Tripulación <small>(USD / mes)</small></span>
+            <input type="number" id="b-trip" min="0" step="any" inputmode="numeric" value="0">
+          </label>
+          <label class="fld"><span class="cap">Combustible y viajes <small>(USD / año)</small></span>
+            <input type="number" id="b-comb" min="0" step="any" inputmode="numeric" value="0">
+          </label>
+          <label class="fld full"><span class="cap">Otros gastos <small>(USD / año — recall, garantías, varios)</small></span>
+            <input type="number" id="b-otros" min="0" step="any" inputmode="numeric" value="0">
+          </label>
+        </div>
+        <p class="form-hint">Mantenimiento incluye reparaciones complejas, recall y garantías. Ajusta el % según la edad del barco.</p>
+      </fieldset>
+      <fieldset>
+        <legend>Financiamiento (bancos)</legend>
+        <label class="check-line"><input type="checkbox" id="b-fin-on"> Incluir financiamiento</label>
+        <div class="frm-grid fin-fields disabled" id="fin-fields">
+          <label class="fld"><span class="cap">Enganche <small>(%)</small></span>
+            <input type="number" id="b-fin-eng" min="0" max="100" step="any" inputmode="decimal" value="30">
+          </label>
+          <label class="fld"><span class="cap">Tasa anual <small>(%)</small></span>
+            <input type="number" id="b-fin-tasa" min="0" step="any" inputmode="decimal" value="8">
+          </label>
+          <label class="fld"><span class="cap">Plazo <small>(años)</small></span>
+            <input type="number" id="b-fin-plazo" min="1" max="30" step="any" inputmode="numeric" value="10">
+          </label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Propiedad fraccional</legend>
+        <label class="fld" style="max-width:220px"><span class="cap">Número de fracciones</span>
+          <input type="number" id="b-frac" min="1" max="32" step="any" inputmode="numeric" value="8">
+        </label>
+        <p class="form-hint">El costo total se divide entre este número de propietarios.</p>
+      </fieldset>
+    </div>
+    <div class="dlg-foot">
+      <button type="button" class="btn btn-ghost" data-close="dlg-barco">Cancelar</button>
+      <button type="submit" class="btn btn-brass" id="b-save">Guardar barco</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- ============ DIALOGO: MARINA ============ -->
+<dialog id="dlg-marina">
+  <form method="dialog" id="frm-marina">
+    <div class="dlg-head"><h3 id="dlg-marina-title">Agregar marina</h3><button type="button" class="dlg-close" data-close="dlg-marina">✕</button></div>
+    <div class="dlg-body">
+      <fieldset>
+        <legend>Datos de la marina</legend>
+        <div class="frm-grid">
+          <label class="fld full"><span class="cap">Nombre</span>
+            <input type="text" id="m-nombre" required placeholder="Ej. Marina Costa Baja">
+          </label>
+          <label class="fld full"><span class="cap">Ubicación <small>(opcional)</small></span>
+            <input type="text" id="m-ubic" placeholder="Ej. La Paz, BCS, México">
+          </label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Tarifa por pie de eslora</legend>
+        <div class="frm-grid">
+          <label class="fld full"><span class="cap">Unidad de la tarifa</span>
+            <select id="m-unidad">
+              <option value="dia">USD por pie por día</option>
+              <option value="mes">USD por pie por mes</option>
+            </select>
+          </label>
+          <label class="fld"><span class="cap">Temporada alta <small id="m-cap-alta">(USD/ft/día)</small></span>
+            <input type="number" id="m-alta" min="0" step="any" inputmode="decimal" placeholder="4.00">
+          </label>
+          <label class="fld"><span class="cap">Temporada baja <small id="m-cap-baja">(USD/ft/día)</small></span>
+            <input type="number" id="m-baja" min="0" step="any" inputmode="decimal" placeholder="1.35">
+          </label>
+          <label class="fld"><span class="cap">Meses de temporada alta</span>
+            <input type="number" id="m-meses" min="0" max="12" step="any" inputmode="numeric" value="6">
+          </label>
+          <label class="fld"><span class="cap">Servicios fijos <small>(USD/mes, opcional)</small></span>
+            <input type="number" id="m-extras" min="0" step="any" inputmode="numeric" value="0">
+          </label>
+        </div>
+        <p class="form-hint" id="m-hint">Ejemplo de referencia: temporada baja $1.35 y alta $4.00 por pie por día, 6 meses cada una.</p>
+      </fieldset>
+    </div>
+    <div class="dlg-foot">
+      <button type="button" class="btn btn-ghost" data-close="dlg-marina">Cancelar</button>
+      <button type="submit" class="btn btn-brass">Guardar marina</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- ============ DIALOGO: DATOS ============ -->
+<dialog id="dlg-datos">
+  <div class="dlg-head"><h3>Tus datos</h3><button type="button" class="dlg-close" data-close="dlg-datos">✕</button></div>
+  <div class="dlg-body">
+    <p class="muted-note" style="margin-bottom:12px">Todo se guarda automáticamente en este dispositivo. Usa <b>Exportar</b> para respaldar o pasar tus datos a otro teléfono / computadora.</p>
+    <div class="data-actions">
+      <button class="btn btn-brass" id="btn-export">⇩ Exportar datos (archivo JSON)</button>
+      <button class="btn btn-ghost" id="btn-import">⇧ Importar datos desde archivo</button>
+      <input type="file" id="file-import" accept=".json,application/json" hidden>
+      <button class="btn btn-danger" id="btn-reset">Restablecer datos de ejemplo</button>
+    </div>
+  </div>
+  <div class="dlg-foot"><button class="btn btn-ghost" data-close="dlg-datos">Cerrar</button></div>
+</dialog>
+
+<script>
+"use strict";
+/* ============================================================
+   MOTOR DE CÁLCULO — funciones puras y auditables
+   Todas las cifras en USD.
+   ============================================================ */
+const DIAS_ANIO = 365;
+
+/** Días de temporada alta a partir de meses (prorrateo 365/12). */
+function diasTemporada(mesesAlta){
+  const m = clamp(num(mesesAlta), 0, 12);
+  const diasAlta = Math.round(m * DIAS_ANIO / 12);
+  return { diasAlta, diasBaja: DIAS_ANIO - diasAlta };
+}
+
+/** Costo anual de marina para una eslora dada (USD/año). null si la marina no tiene ningún costo capturado. */
+function costoMarinaAnual(marina, esloraFt){
+  const alta = num(marina.tarifaAlta), baja = num(marina.tarifaBaja);
+  if (alta <= 0 && baja <= 0){
+    // sin tarifa por pie: comparable solo si tiene servicios fijos capturados
+    return num(marina.extrasMes) > 0 ? num(marina.extrasMes) * 12 : null;
+  }
+  const ft = num(esloraFt);
+  let base;
+  if (marina.unidad === "mes"){
+    const mAlta = clamp(num(marina.mesesAlta), 0, 12);
+    base = ft * (alta * mAlta + baja * (12 - mAlta));
+  } else {
+    const { diasAlta, diasBaja } = diasTemporada(marina.mesesAlta);
+    base = ft * (alta * diasAlta + baja * diasBaja);
+  }
+  return base + num(marina.extrasMes) * 12;
+}
+
+/** Pago anual de un crédito amortizado (sistema francés). */
+function pagoAnualFinanciamiento(precio, engPct, tasaPct, plazoAnios){
+  const P = num(precio) * (1 - clamp(num(engPct),0,100)/100);
+  const n = Math.max(1, Math.round(num(plazoAnios))) * 12;
+  if (P <= 0) return 0;
+  const r = num(tasaPct)/100/12;
+  if (r === 0) return (P / n) * 12;
+  const cuota = P * r / (1 - Math.pow(1 + r, -n));
+  return cuota * 12;
+}
+
+/** Desglose completo anual de un barco en una marina.
+    Cada componente se redondea a dólares enteros ANTES de sumar,
+    para que las filas mostradas siempre cuadren con el total. */
+function desglose(barco, marina){
+  const precio = num(barco.precio);
+  const marinaRaw = marina ? costoMarinaAnual(marina, barco.esloraFt) : null;
+  const marinaAnual = marinaRaw === null ? null : Math.round(marinaRaw);
+  const seguro = Math.round(precio * num(barco.seguroPct)/100);
+  const mant   = Math.round(precio * num(barco.mantPct)/100);
+  const trip   = Math.round(num(barco.tripMes) * 12);
+  const comb   = Math.round(num(barco.combAnual));
+  const otros  = Math.round(num(barco.otrosAnual));
+  const fin    = barco.finOn ? Math.round(pagoAnualFinanciamiento(precio, barco.finEngPct, barco.finTasaPct, barco.finPlazo)) : 0;
+  const operacion = (marinaAnual ?? 0) + seguro + mant + trip + comb + otros;
+  const total  = operacion + fin;
+  const frac   = Math.max(1, Math.round(num(barco.fracciones) || 1));
+  return { marinaAnual, seguro, mant, trip, comb, otros, fin, operacion, total,
+           fracciones: frac, porFraccionAnual: total / frac };
+}
+
+function num(v){ const n = parseFloat(v); return Number.isFinite(n) ? n : 0; }
+function clamp(v, lo, hi){ return Math.min(hi, Math.max(lo, v)); }
+
+/* ============================================================
+   ALMACÉN — localStorage con datos de ejemplo
+   Todo estado externo (localStorage o import) pasa por
+   normalizarEstado(): campos coercionados, ids garantizados.
+   ============================================================ */
+const STORE_KEY = "comparador-yates-v1";
+
+function normalizarEstado(d){
+  if (!d || !Array.isArray(d.marinas) || !Array.isArray(d.barcos)) return null;
+  const ids = new Set();
+  const mkId = (v) => {
+    let id = (typeof v === "string" && v.trim()) ? v.trim() : uid();
+    while (ids.has(id)) id = uid();
+    ids.add(id); return id;
+  };
+  const marinas = d.marinas.filter(m => m && typeof m === "object").map(m => ({
+    id: mkId(m.id),
+    nombre: String(m.nombre ?? "Marina sin nombre"),
+    ubic: String(m.ubic ?? ""),
+    unidad: m.unidad === "mes" ? "mes" : "dia",
+    tarifaAlta: num(m.tarifaAlta), tarifaBaja: num(m.tarifaBaja),
+    mesesAlta: clamp(num(m.mesesAlta), 0, 12), extrasMes: num(m.extrasMes),
+  }));
+  const barcos = d.barcos.filter(b => b && typeof b === "object").map(b => ({
+    id: mkId(b.id),
+    nombre: String(b.nombre ?? "Barco sin nombre"),
+    esloraFt: num(b.esloraFt), precio: num(b.precio),
+    seguroPct: num(b.seguroPct), mantPct: num(b.mantPct),
+    tripMes: num(b.tripMes), combAnual: num(b.combAnual), otrosAnual: num(b.otrosAnual),
+    finOn: !!b.finOn, finEngPct: num(b.finEngPct), finTasaPct: num(b.finTasaPct),
+    finPlazo: num(b.finPlazo) || 10,
+    fracciones: Math.max(1, Math.round(num(b.fracciones) || 1)),
+  }));
+  const marinaSel = marinas.some(m => m.id === d.marinaSel) ? d.marinaSel : (marinas[0]?.id ?? null);
+  return { marinas, barcos, marinaSel };
+}
+
+function datosEjemplo(){
+  return {
+    marinas: [
+      { id:"m-prom",  nombre:"Marina promedio",  ubic:"Referencia general", unidad:"dia", tarifaAlta:4.00, tarifaBaja:1.35, mesesAlta:6, extrasMes:0 },
+      { id:"m-lapaz", nombre:"Marina La Paz",    ubic:"La Paz, BCS, México", unidad:"dia", tarifaAlta:0, tarifaBaja:0, mesesAlta:6, extrasMes:0 },
+      { id:"m-miami", nombre:"Marina Miami",     ubic:"Miami, FL, EE. UU.",  unidad:"dia", tarifaAlta:0, tarifaBaja:0, mesesAlta:6, extrasMes:0 },
+    ],
+    barcos: [
+      b("b-sol70","Solaris 70 Long Range",70), b("b-bgm75","Bluegame BGM75",75),
+      b("b-sun76","Sunseeker 76 Yacht",76),    b("b-sl86","Sanlorenzo SL86A",86),
+      b("b-sx88","Sanlorenzo SX88",88),        b("b-sl90","Sanlorenzo SL90A",90),
+      b("b-sp92","Sanlorenzo SP92",92),
+    ],
+    marinaSel: "m-prom",
+  };
+  function b(id,nombre,ft){
+    return { id, nombre, esloraFt:ft, precio:0, seguroPct:1.5, mantPct:10,
+             tripMes:0, combAnual:0, otrosAnual:0,
+             finOn:false, finEngPct:30, finTasaPct:8, finPlazo:10, fracciones:8 };
+  }
+}
+
+let state;
+function cargar(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if (raw){
+      const d = normalizarEstado(JSON.parse(raw));
+      if (d){ state = d; return; }
+    }
+  }catch(e){ /* almacenamiento no disponible o corrupto: usar ejemplo */ }
+  state = datosEjemplo();
+  guardar();
+}
+function guardar(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){ /* modo privado: solo en memoria */ }
+}
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : "id-" + Date.now() + "-" + Math.random().toString(36).slice(2));
+
+/* ============================================================
+   FORMATO
+   ============================================================ */
+const fmtUSD0 = new Intl.NumberFormat("es-MX",{style:"currency",currency:"USD",maximumFractionDigits:0});
+const fmtUSD2 = new Intl.NumberFormat("es-MX",{style:"currency",currency:"USD",minimumFractionDigits:2,maximumFractionDigits:2});
+const usd  = v => fmtUSD0.format(v);
+const usd2 = v => fmtUSD2.format(v);
+const esc  = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const mts  = ft => (num(ft)*0.3048).toFixed(1);
+function tarifaResumen(m){
+  const u = m.unidad === "mes" ? "ft/mes" : "ft/día";
+  if (num(m.tarifaAlta)<=0 && num(m.tarifaBaja)<=0){
+    return num(m.extrasMes) > 0 ? `solo servicios ${usd(num(m.extrasMes))}/mes` : null;
+  }
+  return `${usd2(num(m.tarifaBaja))}–${usd2(num(m.tarifaAlta))} /${u}`;
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+const $ = id => document.getElementById(id);
+
+function render(){
+  renderMarinas(); renderBarcos(); renderComparar(); guardar();
+}
+
+/* ---------- marinas ---------- */
+function renderMarinas(){
+  const g = $("marinas-grid");
+  $("marinas-count").textContent = state.marinas.length ? `${state.marinas.length} ${state.marinas.length===1?"registrada":"registradas"}` : "";
+  if (!state.marinas.length){
+    g.innerHTML = `<div class="empty" style="grid-column:1/-1">Aún no hay marinas.<br><b>Agrega la primera</b> con su tarifa por pie.</div>`;
+    return;
+  }
+  g.innerHTML = state.marinas.map(m => {
+    const t = tarifaResumen(m);
+    const ej90 = costoMarinaAnual(m, 90);
+    return `<div class="card">
+      <h3>${esc(m.nombre)}</h3>
+      <div class="meta">${esc(m.ubic || "—")}</div>
+      ${t ? `<div class="figures">
+        <div class="fig"><div class="lbl">Tarifa</div><div class="val">${t}</div></div>
+        <div class="fig"><div class="lbl">Alta</div><div class="val">${num(m.mesesAlta)} <small>meses</small></div></div>
+        <div class="fig"><div class="lbl">Ej. barco 90 ft</div><div class="val">${usd(ej90)} <small>/año</small></div></div>
+      </div>` : `<span class="chip-warn">Sin tarifas — edítala para incluirla</span>`}
+      <div class="actions">
+        <button class="btn btn-ghost" data-act="edit-marina" data-id="${esc(m.id)}">Editar</button>
+        <button class="btn btn-danger" data-act="del-marina" data-id="${esc(m.id)}">Eliminar</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+/* ---------- barcos ---------- */
+function renderBarcos(){
+  const g = $("barcos-grid");
+  $("barcos-count").textContent = state.barcos.length ? `${state.barcos.length} en cartera` : "";
+  if (!state.barcos.length){
+    g.innerHTML = `<div class="empty" style="grid-column:1/-1">Aún no hay barcos.<br><b>Agrega el primero</b> con su eslora y precio.</div>`;
+    return;
+  }
+  g.innerHTML = state.barcos.map(bo => {
+    const d = desglose(bo, null);
+    return `<div class="card">
+      <h3>${esc(bo.nombre)}</h3>
+      <div class="meta">${num(bo.esloraFt)} ft · ${mts(bo.esloraFt)} m · ${d.fracciones} ${d.fracciones===1?"fracción":"fracciones"}</div>
+      <div class="figures">
+        <div class="fig"><div class="lbl">Precio</div><div class="val">${num(bo.precio)>0 ? usd(num(bo.precio)) : "—"}</div></div>
+        <div class="fig"><div class="lbl">Seguro</div><div class="val">${num(bo.seguroPct)}<small>%</small></div></div>
+        <div class="fig"><div class="lbl">Mantenim.</div><div class="val">${num(bo.mantPct)}<small>%</small></div></div>
+        ${bo.finOn ? `<div class="fig"><div class="lbl">Financiam.</div><div class="val">${usd(d.fin)} <small>/año</small></div></div>` : ""}
+      </div>
+      ${num(bo.precio)<=0 ? `<span class="chip-warn">Precio pendiente</span>` : ""}
+      <div class="actions">
+        <button class="btn btn-ghost" data-act="edit-barco" data-id="${esc(bo.id)}">Editar</button>
+        <button class="btn btn-danger" data-act="del-barco" data-id="${esc(bo.id)}">Eliminar</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+/* ---------- comparar ---------- */
+function marinaSeleccionada(){
+  // respeta la selección del usuario; solo re-elige si la marina ya no existe
+  let m = state.marinas.find(x => x.id === state.marinaSel);
+  if (!m){
+    m = state.marinas.find(x => costoMarinaAnual(x, 1) !== null) || state.marinas[0] || null;
+    state.marinaSel = m ? m.id : null;
+  }
+  return m;
+}
+
+function renderComparar(){
+  const chips = $("marina-chips"), body = $("comparar-body"), sub = $("comparar-sub");
+  if (!state.barcos.length || !state.marinas.length){
+    chips.innerHTML = "";
+    sub.textContent = "";
+    body.innerHTML = `<div class="empty">Para comparar necesitas al menos <b>un barco</b> y <b>una marina con tarifa</b>.<br>Agrégalos en las pestañas de abajo.</div>`;
+    return;
+  }
+  const mSel = marinaSeleccionada();
+  chips.innerHTML = state.marinas.map(m => {
+    const t = tarifaResumen(m);
+    return `<button class="chip ${m.id===state.marinaSel?"active":""}" data-act="pick-marina" data-id="${esc(m.id)}">
+      ${esc(m.nombre)}${t?` <span class="r">· ${t}</span>`:" <span class='r'>· sin tarifa</span>"}
+    </button>`;
+  }).join("");
+
+  const conTarifa = mSel && costoMarinaAnual(mSel, 1) !== null;
+  sub.textContent = conTarifa ? `En ${mSel.nombre}, por año` : "";
+
+  let html = "";
+  if (!conTarifa){
+    html += mSel
+      ? `<div class="empty"><b>${esc(mSel.nombre)}</b> aún no tiene tarifas capturadas.<br>Captura su tarifa por pie para incluirla en la comparativa.<br><br><button class="btn btn-brass" data-act="edit-marina" data-id="${esc(mSel.id)}">Capturar tarifas</button></div>`
+      : `<div class="empty">Ninguna marina tiene tarifas todavía.<br>Edita una marina y captura su <b>tarifa por pie</b> para ver la comparativa.</div>`;
+  } else {
+    html += tablaComparativa(mSel);
+    html += graficaTotales(mSel);
+  }
+  if (state.marinas.filter(m => costoMarinaAnual(m,1)!==null).length > 1){
+    html += matrizMarinas();
+  }
+  body.innerHTML = html;
+}
+
+function tablaComparativa(marina){
+  const barcos = state.barcos;
+  const ds = barcos.map(bo => desglose(bo, marina));
+  // resaltados solo entre barcos con precio capturado; requiere al menos 2 para comparar.
+  // Empates: se marcan todos los que igualan el mínimo (consistente con gráfica y matriz).
+  const validos = ds.map((d,i)=>({d,i})).filter(x => num(barcos[x.i].precio) > 0);
+  const mejorTotal = validos.length >= 2 ? Math.min(...validos.map(x=>x.d.total)) : null;
+  const mejorFrac  = validos.length >= 2 ? Math.min(...validos.map(x=>x.d.porFraccionAnual)) : null;
+  const esMejor  = i => mejorTotal !== null && num(barcos[i].precio) > 0 && ds[i].total === mejorTotal;
+  const esMejorF = i => mejorFrac !== null && num(barcos[i].precio) > 0 && ds[i].porFraccionAnual === mejorFrac;
+
+  const fila = (lbl, note, get) => `<tr>
+    <td><span class="lbl">${lbl}</span>${note?`<span class="note">${note}</span>`:""}</td>
+    ${ds.map((d,i)=>{ const v = get(d, barcos[i]);
+      return v === null ? `<td class="na">—</td>` : `<td>${v}</td>`;
+    }).join("")}
+  </tr>`;
+
+  return `<div class="table-wrap"><table class="ledger">
+    <thead><tr>
+      <th>Concepto</th>
+      ${barcos.map((bo,i)=>`<th>${esc(bo.nombre)}
+        <span class="sub">${num(bo.esloraFt)} ft · ${mts(bo.esloraFt)} m</span>
+        ${num(bo.precio)<=0?`<span class="flag">PRECIO PENDIENTE</span>`:""}
+        ${esMejor(i)?`<span class="badge-best">◆ MENOR TOTAL ANUAL</span>`:""}
+      </th>`).join("")}
+    </tr></thead>
+    <tbody>
+      ${fila("Precio del barco","valor de compra",(d,bo)=> num(bo.precio)>0 ? usd(num(bo.precio)) : null)}
+      ${fila("Marina","tarifa × eslora",(d)=> d.marinaAnual===null ? null : usd(d.marinaAnual))}
+      ${fila("Seguro","% del valor",(d,bo)=> num(bo.precio)>0 ? usd(d.seguro) : null)}
+      ${fila("Mantenimiento","reparaciones · recall · garantías",(d,bo)=> num(bo.precio)>0 ? usd(d.mant) : null)}
+      ${fila("Tripulación","",(d)=> usd(d.trip))}
+      ${fila("Combustible y viajes","",(d)=> usd(d.comb))}
+      ${fila("Otros gastos","",(d)=> usd(d.otros))}
+      ${fila("Financiamiento","cuota anual del crédito",(d,bo)=> bo.finOn ? (num(bo.precio)>0 ? usd(d.fin) : null) : usd(0))}
+      <tr class="total"><td><span class="lbl">TOTAL ANUAL</span></td>${ds.map((d,i)=>`<td class="${esMejor(i)?'best':''}">${usd(d.total)}</td>`).join("")}</tr>
+      <tr><td><span class="lbl">Total mensual</span></td>${ds.map(d=>`<td>${usd(d.total/12)}</td>`).join("")}</tr>
+      <tr class="fraction"><td><span class="lbl">Por fracción · año</span><span class="note">entre n.º de fracciones</span></td>${ds.map((d,i)=>`<td class="${esMejorF(i)?'best':''}">${usd(d.porFraccionAnual)} <small>/${d.fracciones}</small></td>`).join("")}</tr>
+      <tr class="fraction"><td><span class="lbl">Por fracción · mes</span></td>${ds.map(d=>`<td>${usd(d.porFraccionAnual/12)}</td>`).join("")}</tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="hint">El total anual suma marina, seguro, mantenimiento, tripulación, combustible, otros y financiamiento. Desliza la tabla a los lados para ver todos los barcos. ◆ marca el menor total anual y la menor cuota por fracción (solo entre barcos con precio capturado).</p>`;
+}
+
+function graficaTotales(marina){
+  const barcos = state.barcos;
+  if (barcos.length < 2) return "";
+  const ds = barcos.map(bo => ({ bo, d: desglose(bo, marina) }));
+  const max = Math.max(...ds.map(x => x.d.total), 1);
+  const conPrecio = ds.filter(x=>num(x.bo.precio)>0);
+  const min = conPrecio.length >= 2 ? Math.min(...conPrecio.map(x => x.d.total)) : Infinity;
+  return `<div class="chart"><h3>Total anual por barco — ${esc(marina.nombre)}</h3>
+    ${ds.map(({bo,d}) => {
+      const sinPrecio = num(bo.precio) <= 0;
+      return `<div class="bar-row ${!sinPrecio && d.total===min ? "best":""} ${sinPrecio ? "pending":""}">
+      <span class="name">${esc(bo.nombre)}${sinPrecio ? `<small class="pend">precio pendiente</small>` : ""}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.max(2,(d.total/max*100)).toFixed(1)}%"></div></div>
+      <span class="amt">${usd(d.total)}</span>
+    </div>`;}).join("")}
+  </div>`;
+}
+
+function matrizMarinas(){
+  const marinas = state.marinas.filter(m => costoMarinaAnual(m,1) !== null);
+  const barcos = state.barcos;
+  return `<div class="section-head" style="margin-top:26px"><h2>Marina por marina</h2><span class="sub">costo anual solo de marina</span></div>
+  <div class="rule"></div>
+  <div class="table-wrap"><table class="ledger">
+    <thead><tr><th>Barco</th>${marinas.map(m=>`<th>${esc(m.nombre)}<span class="sub">${tarifaResumen(m)}</span></th>`).join("")}</tr></thead>
+    <tbody>
+      ${barcos.map(bo=>{
+        const costos = marinas.map(m => costoMarinaAnual(m, bo.esloraFt));
+        const minC = Math.min(...costos);
+        return `<tr><td><span class="lbl">${esc(bo.nombre)}</span><span class="note">${num(bo.esloraFt)} ft</span></td>
+          ${costos.map(c=>`<td class="${c===minC && marinas.length>1 ? "best":""}">${usd(c)}</td>`).join("")}</tr>`;
+      }).join("")}
+    </tbody>
+  </table>
+  </div>
+  <p class="hint">◆ marca la marina más económica para cada barco.</p>`;
+}
+
+/* ============================================================
+   ACCIONES
+   ============================================================ */
+function elegirMarina(id){ state.marinaSel = id; render(); }
+
+/* --- barcos --- */
+let editandoBarco = null;
+function abrirBarco(id){
+  editandoBarco = id || null;
+  const bo = id ? state.barcos.find(x=>x.id===id) : null;
+  $("dlg-barco-title").textContent = bo ? "Editar barco" : "Agregar barco";
+  $("b-nombre").value = bo?.nombre ?? "";
+  $("b-eslora").value = bo?.esloraFt ?? "";
+  $("b-precio").value = bo && num(bo.precio)>0 ? bo.precio : "";
+  $("b-seguro").value = bo?.seguroPct ?? 1.5;
+  $("b-mant").value   = bo?.mantPct ?? 10;
+  $("b-trip").value   = bo?.tripMes ?? 0;
+  $("b-comb").value   = bo?.combAnual ?? 0;
+  $("b-otros").value  = bo?.otrosAnual ?? 0;
+  $("b-fin-on").checked = !!bo?.finOn;
+  $("b-fin-eng").value  = bo?.finEngPct ?? 30;
+  $("b-fin-tasa").value = bo?.finTasaPct ?? 8;
+  $("b-fin-plazo").value= bo?.finPlazo ?? 10;
+  $("b-frac").value     = bo?.fracciones ?? 8;
+  actualizarFinFields(); actualizarEsloraHint();
+  $("dlg-barco").showModal();
+}
+function guardarBarco(){
+  const datos = {
+    nombre: $("b-nombre").value.trim() || "Barco sin nombre",
+    esloraFt: num($("b-eslora").value),
+    precio: num($("b-precio").value),
+    seguroPct: num($("b-seguro").value),
+    mantPct: num($("b-mant").value),
+    tripMes: num($("b-trip").value),
+    combAnual: num($("b-comb").value),
+    otrosAnual: num($("b-otros").value),
+    finOn: $("b-fin-on").checked,
+    finEngPct: num($("b-fin-eng").value),
+    finTasaPct: num($("b-fin-tasa").value),
+    finPlazo: num($("b-fin-plazo").value),
+    fracciones: Math.max(1, Math.round(num($("b-frac").value) || 1)),
+  };
+  const existente = editandoBarco ? state.barcos.find(x=>x.id===editandoBarco) : null;
+  if (existente){ Object.assign(existente, datos); }
+  else { state.barcos.push({ id: uid(), ...datos }); }
+  render();
+}
+function borrarBarco(id){
+  const bo = state.barcos.find(x=>x.id===id);
+  if (!confirm(`¿Eliminar "${bo?.nombre}"?`)) return;
+  state.barcos = state.barcos.filter(x=>x.id!==id);
+  render();
+}
+
+/* --- marinas --- */
+let editandoMarina = null;
+function abrirMarina(id){
+  editandoMarina = id || null;
+  const m = id ? state.marinas.find(x=>x.id===id) : null;
+  $("dlg-marina-title").textContent = m ? "Editar marina" : "Agregar marina";
+  $("m-nombre").value = m?.nombre ?? "";
+  $("m-ubic").value   = m?.ubic ?? "";
+  $("m-unidad").value = m?.unidad ?? "dia";
+  $("m-alta").value   = m && num(m.tarifaAlta)>0 ? m.tarifaAlta : "";
+  $("m-baja").value   = m && num(m.tarifaBaja)>0 ? m.tarifaBaja : "";
+  $("m-meses").value  = m?.mesesAlta ?? 6;
+  $("m-extras").value = m?.extrasMes ?? 0;
+  actualizarUnidadMarina();
+  $("dlg-marina").showModal();
+}
+function guardarMarina(){
+  const datos = {
+    nombre: $("m-nombre").value.trim() || "Marina sin nombre",
+    ubic: $("m-ubic").value.trim(),
+    unidad: $("m-unidad").value === "mes" ? "mes" : "dia",
+    tarifaAlta: num($("m-alta").value),
+    tarifaBaja: num($("m-baja").value),
+    mesesAlta: clamp(num($("m-meses").value), 0, 12),
+    extrasMes: num($("m-extras").value),
+  };
+  const existente = editandoMarina ? state.marinas.find(x=>x.id===editandoMarina) : null;
+  if (existente){ Object.assign(existente, datos); }
+  else {
+    const nueva = { id: uid(), ...datos };
+    state.marinas.push(nueva);
+    if (costoMarinaAnual(nueva,1) !== null) state.marinaSel = nueva.id;
+  }
+  render();
+}
+function borrarMarina(id){
+  const m = state.marinas.find(x=>x.id===id);
+  if (!confirm(`¿Eliminar "${m?.nombre}"?`)) return;
+  state.marinas = state.marinas.filter(x=>x.id!==id);
+  render();
+}
+
+/* --- datos --- */
+function exportar(){
+  const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "comparador-yates-datos.json";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+function importar(file){
+  const rd = new FileReader();
+  rd.onload = () => {
+    try{
+      const d = normalizarEstado(JSON.parse(rd.result));
+      if (!d) throw new Error("formato");
+      state = d; render();
+      $("dlg-datos").close();
+      alert("Datos importados correctamente.");
+    }catch(e){ alert("El archivo no es un respaldo válido del Comparador de Yates."); }
+  };
+  rd.onerror = () => alert("No se pudo leer el archivo. Inténtalo de nuevo.");
+  rd.readAsText(file);
+}
+
+/* ============================================================
+   EVENTOS
+   ============================================================ */
+function setTab(view){
+  document.querySelectorAll("#tabbar button").forEach(b=>b.classList.toggle("active", b.dataset.view===view));
+  document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active", v.id === "view-"+view));
+  window.scrollTo({top:0});
+}
+document.querySelectorAll("#tabbar button").forEach(btn =>
+  btn.addEventListener("click", () => setTab(btn.dataset.view)));
+
+// acciones delegadas de tarjetas y chips (los ids nunca se interpolan en JS inline)
+document.addEventListener("click", e => {
+  const el = e.target.closest("[data-act]");
+  if (!el) return;
+  const id = el.dataset.id;
+  switch (el.dataset.act){
+    case "edit-barco":  abrirBarco(id); break;
+    case "del-barco":   borrarBarco(id); break;
+    case "edit-marina": abrirMarina(id); break;
+    case "del-marina":  borrarMarina(id); break;
+    case "pick-marina": elegirMarina(id); break;
+  }
+});
+document.querySelectorAll("[data-close]").forEach(b => b.addEventListener("click", () => $(b.dataset.close).close()));
+
+$("btn-add-barco").addEventListener("click", () => abrirBarco(null));
+$("btn-add-marina").addEventListener("click", () => abrirMarina(null));
+$("frm-barco").addEventListener("submit", guardarBarco);
+$("frm-marina").addEventListener("submit", guardarMarina);
+
+$("b-fin-on").addEventListener("change", actualizarFinFields);
+function actualizarFinFields(){ $("fin-fields").classList.toggle("disabled", !$("b-fin-on").checked); }
+
+$("m-unidad").addEventListener("change", actualizarUnidadMarina);
+function actualizarUnidadMarina(){
+  const mes = $("m-unidad").value === "mes";
+  const u = mes ? "(USD/ft/mes)" : "(USD/ft/día)";
+  $("m-cap-alta").textContent = u; $("m-cap-baja").textContent = u;
+  $("m-hint").textContent = mes
+    ? "Ejemplo de referencia: temporada baja $18 y alta $40 por pie por mes, 6 meses cada una."
+    : "Ejemplo de referencia: temporada baja $1.35 y alta $4.00 por pie por día, 6 meses cada una.";
+}
+$("b-eslora").addEventListener("input", actualizarEsloraHint);
+function actualizarEsloraHint(){
+  const ft = num($("b-eslora").value);
+  $("b-eslora-hint").textContent = ft > 0 ? `${ft} pies ≈ ${mts(ft)} metros de eslora.` : "";
+}
+
+$("btn-datos").addEventListener("click", () => $("dlg-datos").showModal());
+$("btn-print").addEventListener("click", () => { setTab("comparar"); window.print(); });
+$("btn-export").addEventListener("click", exportar);
+$("btn-import").addEventListener("click", () => $("file-import").click());
+$("file-import").addEventListener("change", e => { if (e.target.files[0]) importar(e.target.files[0]); e.target.value=""; });
+$("btn-reset").addEventListener("click", () => {
+  if (!confirm("Esto borra todos tus datos y regresa a los de ejemplo. ¿Continuar?")) return;
+  state = datosEjemplo(); render(); $("dlg-datos").close();
+});
+
+/* arranque */
+cargar();
+render();
+</script>
+</body>
+</html>
