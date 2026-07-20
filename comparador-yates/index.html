@@ -193,6 +193,12 @@ main{max-width:1080px;margin:0 auto;padding:18px 20px 40px}
   box-shadow:0 6px 18px -8px rgba(194,161,90,.7);
 }
 .marina-chips .chip .r{font-weight:500;opacity:.75;font-size:12px}
+.crit-chips{margin-top:-8px}
+.crit-chips .crit-label{
+  align-self:center;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--mist);font-weight:700;margin-right:2px;
+}
+.crit-chips .chip{padding:6px 12px;font-size:12px}
 
 .table-wrap{
   overflow-x:auto;border-radius:var(--radius);box-shadow:var(--shadow-lg);
@@ -361,6 +367,10 @@ label.fld .cap small{font-weight:400;color:#7C8A97}
     <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><path d="M12 7v13m0 0C7 20 4 16.5 4 13m8 7c5 0 8-3.5 8-7M4 13H2m2 0h2m14 0h2m-4 0h2"/></svg>
     Marinas
   </button>
+  <button data-view="bancos">
+    <svg viewBox="0 0 24 24"><path d="M3 10l9-6 9 6M5 10v8m4-8v8m6-8v8m4-8v8M3 18h18M3 21h18"/></svg>
+    Bancos
+  </button>
 </nav>
 
 <main>
@@ -373,6 +383,7 @@ label.fld .cap small{font-weight:400;color:#7C8A97}
     </div>
     <div class="rule"></div>
     <div class="marina-chips" id="marina-chips"></div>
+    <div class="marina-chips crit-chips" id="criterio-chips"></div>
     <div id="comparar-body"></div>
   </section>
 
@@ -396,6 +407,17 @@ label.fld .cap small{font-weight:400;color:#7C8A97}
     <div class="rule"></div>
     <div class="card-grid" id="marinas-grid"></div>
     <div class="add-row"><button class="btn btn-brass" id="btn-add-marina">＋ Agregar marina</button></div>
+  </section>
+
+  <!-- ============ BANCOS ============ -->
+  <section class="view" id="view-bancos">
+    <div class="section-head">
+      <h2>Bancos y financiamiento</h2>
+      <span class="sub" id="bancos-count"></span>
+    </div>
+    <div class="rule"></div>
+    <div class="card-grid" id="bancos-grid"></div>
+    <div class="add-row"><button class="btn btn-brass" id="btn-add-banco">＋ Agregar banco / oferta</button></div>
   </section>
 
 </main>
@@ -454,6 +476,9 @@ label.fld .cap small{font-weight:400;color:#7C8A97}
         <legend>Financiamiento (bancos)</legend>
         <label class="check-line"><input type="checkbox" id="b-fin-on"> Incluir financiamiento</label>
         <div class="frm-grid fin-fields disabled" id="fin-fields">
+          <label class="fld full"><span class="cap">Banco / oferta <small>(o parámetros manuales)</small></span>
+            <select id="b-banco"></select>
+          </label>
           <label class="fld"><span class="cap">Enganche <small>(%)</small></span>
             <input type="number" id="b-fin-eng" min="0" max="100" step="any" inputmode="decimal" value="20">
           </label>
@@ -464,6 +489,7 @@ label.fld .cap small{font-weight:400;color:#7C8A97}
             <input type="number" id="b-fin-plazo" min="1" max="30" step="any" inputmode="numeric" value="5">
           </label>
         </div>
+        <p class="form-hint">Si eliges un banco de la pestaña Bancos, se usan su tasa, enganche y plazo; los campos manuales aplican solo con «Parámetros manuales».</p>
       </fieldset>
       <fieldset>
         <legend>Proyección y propiedad fraccional</legend>
@@ -483,8 +509,14 @@ label.fld .cap small{font-weight:400;color:#7C8A97}
           <label class="fld"><span class="cap">Días de uso por fracción <small>(al año, opcional)</small></span>
             <input type="number" id="b-dias" min="0" max="365" step="any" inputmode="numeric" value="0">
           </label>
+          <label class="fld"><span class="cap">Días de uso al año <small>(barco completo, opcional)</small></span>
+            <input type="number" id="b-diasuso" min="0" max="365" step="any" inputmode="numeric" value="0">
+          </label>
+          <label class="fld"><span class="cap">Charter equivalente <small>(USD/día, opcional)</small></span>
+            <input type="number" id="b-charter" min="0" step="any" inputmode="numeric" value="0">
+          </label>
         </div>
-        <p class="form-hint">La depreciación estándar del mercado náutico ronda 39% al año 5. La cuota de gestión (típica en programas fraccionales: ~10%) se aplica sobre la operación. Si el precio por fracción se deja en 0, se calcula como precio ÷ fracciones.</p>
+        <p class="form-hint">La depreciación estándar del mercado náutico ronda 39% al año 5. La cuota de gestión (típica en fraccionales: ~10%) se aplica sobre la operación. Si el precio por fracción queda en 0 se calcula como precio ÷ fracciones; si los días de uso del barco quedan en 0 se usan fracciones × días por fracción. El charter equivalente permite comparar el costo por día contra rentar un barco similar.</p>
       </fieldset>
     </div>
     <div class="dlg-foot">
@@ -538,6 +570,40 @@ label.fld .cap small{font-weight:400;color:#7C8A97}
     <div class="dlg-foot">
       <button type="button" class="btn btn-ghost" data-close="dlg-marina">Cancelar</button>
       <button type="submit" class="btn btn-brass">Guardar marina</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- ============ DIALOGO: BANCO ============ -->
+<dialog id="dlg-banco">
+  <form method="dialog" id="frm-banco">
+    <div class="dlg-head"><h3 id="dlg-banco-title">Agregar banco / oferta</h3><button type="button" class="dlg-close" data-close="dlg-banco">✕</button></div>
+    <div class="dlg-body">
+      <fieldset>
+        <legend>Oferta de financiamiento</legend>
+        <div class="frm-grid">
+          <label class="fld full"><span class="cap">Banco / institución</span>
+            <input type="text" id="k-nombre" required placeholder="Ej. BNP Paribas Marine Finance">
+          </label>
+          <label class="fld"><span class="cap">Tasa anual <small>(%)</small></span>
+            <input type="number" id="k-tasa" required min="0" max="100" step="any" inputmode="decimal" placeholder="5.7">
+          </label>
+          <label class="fld"><span class="cap">Enganche <small>(%)</small></span>
+            <input type="number" id="k-eng" min="0" max="100" step="any" inputmode="decimal" value="20">
+          </label>
+          <label class="fld"><span class="cap">Plazo <small>(años)</small></span>
+            <input type="number" id="k-plazo" min="1" max="30" step="any" inputmode="numeric" value="5">
+          </label>
+          <label class="fld full"><span class="cap">Nota <small>(opcional — condiciones, fecha de la cotización)</small></span>
+            <input type="text" id="k-nota" placeholder="Ej. cotización del 15/jul, sujeta a perfil">
+          </label>
+        </div>
+        <p class="form-hint">Captura aquí cada cotización real que reciban. Asigna un banco a un barco en su formulario, o usa el modo ✦ Óptimo para que cada barco tome la mejor tasa disponible.</p>
+      </fieldset>
+    </div>
+    <div class="dlg-foot">
+      <button type="button" class="btn btn-ghost" data-close="dlg-banco">Cancelar</button>
+      <button type="submit" class="btn btn-brass">Guardar banco</button>
     </div>
   </form>
 </dialog>
@@ -618,13 +684,14 @@ function saldoCredito(precio, engPct, tasaPct, plazoAnios, kMeses){
 function proyeccion5(barco, d){
   const precio = num(barco.precio);
   const HORIZ = 60;
+  const fp = d.fp || finParams(barco, bancoDe(barco));
   let pagado, saldo;
   if (barco.finOn && precio > 0){
-    const enganche = precio * clamp(num(barco.finEngPct),0,100)/100;
-    const cuotaAnual = pagoAnualFinanciamiento(precio, barco.finEngPct, barco.finTasaPct, barco.finPlazo);
-    const nMeses = Math.max(1, Math.round(num(barco.finPlazo))) * 12;
+    const enganche = precio * clamp(num(fp.engPct),0,100)/100;
+    const cuotaAnual = pagoAnualFinanciamiento(precio, fp.engPct, fp.tasaPct, fp.plazo);
+    const nMeses = Math.max(1, Math.round(num(fp.plazo))) * 12;
     pagado = Math.round(enganche + (cuotaAnual/12) * Math.min(HORIZ, nMeses));
-    saldo  = Math.round(saldoCredito(precio, barco.finEngPct, barco.finTasaPct, barco.finPlazo, HORIZ));
+    saldo  = Math.round(saldoCredito(precio, fp.engPct, fp.tasaPct, fp.plazo, HORIZ));
   } else {
     pagado = Math.round(precio); saldo = 0;
   }
@@ -640,10 +707,49 @@ function extrasAnualBarco(barco){
     s + Math.round(num(e.monto) * (e.periodo === "mes" ? 12 : 1)), 0);
 }
 
+/** Parámetros de financiamiento efectivos: banco elegido u overrides manuales del barco. */
+function finParams(barco, banco){
+  return banco
+    ? { engPct: num(banco.engPct), tasaPct: num(banco.tasaPct), plazo: num(banco.plazoAnios) || 5 }
+    : { engPct: num(barco.finEngPct), tasaPct: num(barco.finTasaPct), plazo: num(barco.finPlazo) || 5 };
+}
+function bancoDe(barco){ return state?.bancos?.find(x => x.id === barco.bancoId) || null; }
+
+/** Mejor marina (menor costo anual de marina) para la eslora del barco. */
+function mejorMarinaPara(barco){
+  let mejor = null, min = Infinity;
+  for (const m of (state?.marinas || [])){
+    const c = costoMarinaAnual(m, barco.esloraFt);
+    if (c !== null && c < min){ min = c; mejor = m; }
+  }
+  return mejor;
+}
+/** Mejor banco: menor tasa anual; en empate, menor pago anual. null si no hay bancos. */
+function mejorBancoPara(barco){
+  let mejor = null;
+  for (const bk of (state?.bancos || [])){
+    if (!mejor){ mejor = bk; continue; }
+    if (bk.tasaPct < mejor.tasaPct) mejor = bk;
+    else if (bk.tasaPct === mejor.tasaPct){
+      const a = pagoAnualFinanciamiento(barco.precio, bk.engPct, bk.tasaPct, bk.plazoAnios);
+      const b = pagoAnualFinanciamiento(barco.precio, mejor.engPct, mejor.tasaPct, mejor.plazoAnios);
+      if (a < b) mejor = bk;
+    }
+  }
+  return mejor;
+}
+/** Días de uso efectivos del barco completo (capturados, o fracciones × días por fracción). */
+function diasUsoDe(barco){
+  const d = num(barco.diasUso);
+  if (d > 0) return d;
+  const df = num(barco.diasFraccion);
+  return df > 0 ? Math.min(365, df * Math.max(1, Math.round(num(barco.fracciones) || 1))) : 0;
+}
+
 /** Desglose completo anual de un barco en una marina.
     Cada componente se redondea a dólares enteros ANTES de sumar,
     para que las filas mostradas siempre cuadren con el total. */
-function desglose(barco, marina){
+function desglose(barco, marina, finOverride){
   const precio = num(barco.precio);
   const marinaRaw = marina ? costoMarinaAnual(marina, barco.esloraFt) : null;
   const marinaAnual = marinaRaw === null ? null : Math.round(marinaRaw);
@@ -655,11 +761,12 @@ function desglose(barco, marina){
   const extras = extrasAnualBarco(barco);
   const subtotal = (marinaAnual ?? 0) + seguro + mant + trip + comb + otros + extras;
   const gestion = Math.round(subtotal * clamp(num(barco.gestionPct), 0, 100)/100);
-  const fin    = barco.finOn ? Math.round(pagoAnualFinanciamiento(precio, barco.finEngPct, barco.finTasaPct, barco.finPlazo)) : 0;
+  const fp = finOverride || finParams(barco, bancoDe(barco));
+  const fin = barco.finOn ? Math.round(pagoAnualFinanciamiento(precio, fp.engPct, fp.tasaPct, fp.plazo)) : 0;
   const operacion = subtotal + gestion;
   const total  = operacion + fin;
   const frac   = Math.max(1, Math.round(num(barco.fracciones) || 1));
-  return { marinaAnual, seguro, mant, trip, comb, otros, extras, gestion, fin, operacion, total,
+  return { marinaAnual, seguro, mant, trip, comb, otros, extras, gestion, fin, fp, operacion, total,
            fracciones: frac, porFraccionAnual: total / frac };
 }
 
@@ -671,7 +778,7 @@ function clamp(v, lo, hi){ return Math.min(hi, Math.max(lo, v)); }
    Todo estado externo (localStorage o import) pasa por
    normalizarEstado(): campos coercionados, ids garantizados.
    ============================================================ */
-const STORE_KEY = "comparador-yates-v3";
+const STORE_KEY = "comparador-yates-v4";
 
 function normalizarEstado(d){
   if (!d || !Array.isArray(d.marinas) || !Array.isArray(d.barcos)) return null;
@@ -689,6 +796,14 @@ function normalizarEstado(d){
     tarifaAlta: num(m.tarifaAlta), tarifaBaja: num(m.tarifaBaja),
     mesesAlta: clamp(num(m.mesesAlta), 0, 12), extrasMes: num(m.extrasMes),
   }));
+  const bancos = (Array.isArray(d.bancos) ? d.bancos : []).filter(b => b && typeof b === "object").map(bk => ({
+    id: mkId(bk.id),
+    nombre: String(bk.nombre ?? "Banco sin nombre"),
+    tasaPct: clamp(num(bk.tasaPct), 0, 100),
+    engPct: clamp(num(bk.engPct), 0, 100),
+    plazoAnios: clamp(num(bk.plazoAnios), 1, 30) || 5,
+    nota: String(bk.nota ?? ""),
+  }));
   const barcos = d.barcos.filter(b => b && typeof b === "object").map(b => ({
     id: mkId(b.id),
     nombre: String(b.nombre ?? "Barco sin nombre"),
@@ -697,20 +812,24 @@ function normalizarEstado(d){
     tripMes: num(b.tripMes), combAnual: num(b.combAnual), otrosAnual: num(b.otrosAnual),
     finOn: !!b.finOn, finEngPct: num(b.finEngPct), finTasaPct: num(b.finTasaPct),
     finPlazo: num(b.finPlazo) || 10,
+    bancoId: (typeof b.bancoId === "string" && bancos.some(x => x.id === b.bancoId)) ? b.bancoId : null,
     depPct5: b.depPct5 === undefined ? 39.1 : clamp(num(b.depPct5), 0, 100),
     fracciones: Math.max(1, Math.round(num(b.fracciones) || 1)),
     marinaId: (typeof b.marinaId === "string" && marinas.some(m => m.id === b.marinaId)) ? b.marinaId : null,
     gestionPct: clamp(num(b.gestionPct), 0, 100),
     precioFraccion: num(b.precioFraccion),
     diasFraccion: clamp(num(b.diasFraccion), 0, 365),
+    diasUso: clamp(num(b.diasUso), 0, 365),
+    charterDia: num(b.charterDia),
     extras: Array.isArray(b.extras) ? b.extras.filter(e => e && typeof e === "object").map(e => ({
       nombre: String(e.nombre ?? "Concepto"), monto: num(e.monto),
       periodo: e.periodo === "mes" ? "mes" : "año",
     })) : [],
   }));
-  const marinaSel = (d.marinaSel === "__asig" || marinas.some(m => m.id === d.marinaSel))
+  const marinaSel = (d.marinaSel === "__asig" || d.marinaSel === "__opt" || marinas.some(m => m.id === d.marinaSel))
     ? d.marinaSel : (marinas[0]?.id ?? null);
-  return { marinas, barcos, marinaSel };
+  const criterio = ["total","pie","dia","charter","neto5pie"].includes(d.criterio) ? d.criterio : "total";
+  return { marinas, bancos, barcos, marinaSel, criterio };
 }
 
 function datosEjemplo(){
@@ -725,6 +844,14 @@ function datosEjemplo(){
       { id:"m-miami", nombre:"Miami Beach Marina", ubic:"Miami Beach, FL · solo bajo cotización (305-673-6000)", unidad:"dia", tarifaAlta:0, tarifaBaja:0, mesesAlta:5, extrasMes:0 },
       { id:"m-vallarta", nombre:"Marina Riviera Nayarit (La Cruz)", ubic:"Bahía de Banderas, Nay. · tarifario 2025-26 banda 91'+, + 16% IVA", unidad:"dia", tarifaAlta:1.98, tarifaBaja:0.71, mesesAlta:7, extrasMes:0 },
     ],
+    bancos: [
+      /* Opciones de financiamiento. La primera es el escenario del memorándum de crédito de
+         Ricardo; las demás son referencias públicas verificadas (jul 2026) — captura las
+         cotizaciones reales cuando los bancos respondan. */
+      { id:"bk-memo",     nombre:"Memorándum BKI",              tasaPct:5.7,  engPct:20, plazoAnios:5,  nota:"Escenario del memorándum de crédito (parámetros negociables)" },
+      { id:"bk-sterling", nombre:"Sterling Associates (ref.)",  tasaPct:5.75, engPct:20, plazoAnios:20, nota:"Tarifa publicada 6/1/26: 5.75% APR fijo en préstamos de $500k+, hasta 240 meses" },
+      { id:"bk-trident",  nombre:"YachtWorld · Trident (ref.)", tasaPct:6.49, engPct:20, plazoAnios:20, nota:"«APR desde 6.49%», préstamos hasta $10M, 20 años (publicado jul 2026)" },
+    ],
     barcos: [
       /* Datos reales tomados de los documentos de Ricardo (expedientes BKI rev. 2/3/2026,
          listas de precios Sanlorenzo Americas, contratos de compraventa, programa fraccional
@@ -732,11 +859,11 @@ function datosEjemplo(){
       b("b-sol70","Solaris 70 Long Range",70,{ precio:4048720, marinaId:"m-lapaz" }), // asking 2026, Solaris Power Florida (YachtWay, jul 2026)
       b("b-bgm75","Bluegame BGM75",74.7,{ precio:10850000, marinaId:"m-ftl" }), // precio público según Ricardo (chat 1/jul)
       b("b-sun76","Sunseeker 76 (2020) · Chinonino",77.4,{ precio:2000000, marinaId:"m-lapaz" }), // contrato 29/jun/2026
-      b("b-sl86","Sanlorenzo SL86A (casco 878)",86,{ precio:11236100, marinaId:"m-ftl",
+      b("b-sl86","Sanlorenzo SL86A (casco 878)",86,{ precio:11236100, marinaId:"m-ftl", bancoId:"bk-memo",
         seguroPct:0.9, mantPct:2.3, tripMes:38903, combAnual:144496, otrosAnual:44460, finOn:true, depPct5:39.8 }),
-      b("b-sx88","Sanlorenzo SX88 (casco 162)",88,{ precio:10976000, marinaId:"m-ftl",
+      b("b-sx88","Sanlorenzo SX88 (casco 162)",88,{ precio:10976000, marinaId:"m-ftl", bancoId:"bk-memo",
         seguroPct:0.9, mantPct:2.3, tripMes:37930, combAnual:140881, otrosAnual:43348, finOn:true, depPct5:39.9 }),
-      b("b-sl90","Sanlorenzo SL90A (casco 868)",90,{ precio:12196300, marinaId:"m-ftl",
+      b("b-sl90","Sanlorenzo SL90A (casco 868)",90,{ precio:12196300, marinaId:"m-ftl", bancoId:"bk-memo",
         seguroPct:0.9, mantPct:2.3, tripMes:42236, combAnual:156875, otrosAnual:48269, finOn:true, depPct5:39.8 }),
       b("b-sp92","Sanlorenzo SP92 (casco 21)",92,{ precio:12475000, marinaId:"m-ftl", // ops con el modelo BKI (10% del valor)
         seguroPct:0.9, mantPct:2.3, tripMes:43663, combAnual:162175, otrosAnual:49900 }),
@@ -746,12 +873,13 @@ function datosEjemplo(){
         fracciones:4, gestionPct:10, precioFraccion:1945000, diasFraccion:50 }),
     ],
     marinaSel: "__asig",
+    criterio: "total",
   };
   function b(id,nombre,ft,extra){
     return { id, nombre, esloraFt:ft, precio:0, seguroPct:1.5, mantPct:10,
              tripMes:0, combAnual:0, otrosAnual:0,
-             finOn:false, finEngPct:20, finTasaPct:5.7, finPlazo:5, depPct5:39.1, fracciones:8,
-             marinaId:null, gestionPct:0, precioFraccion:0, diasFraccion:0, extras:[], ...extra };
+             finOn:false, finEngPct:20, finTasaPct:5.7, finPlazo:5, bancoId:null, depPct5:39.1, fracciones:8,
+             marinaId:null, gestionPct:0, precioFraccion:0, diasFraccion:0, diasUso:0, charterDia:0, extras:[], ...extra };
   }
 }
 
@@ -795,7 +923,7 @@ function tarifaResumen(m){
 const $ = id => document.getElementById(id);
 
 function render(){
-  renderMarinas(); renderBarcos(); renderComparar(); guardar();
+  renderMarinas(); renderBarcos(); renderBancos(); renderComparar(); guardar();
 }
 
 /* ---------- marinas ---------- */
@@ -837,7 +965,7 @@ function renderBarcos(){
     const d = desglose(bo, null);
     return `<div class="card">
       <h3>${esc(bo.nombre)}</h3>
-      <div class="meta">${num(bo.esloraFt)} ft · ${mts(bo.esloraFt)} m · ${d.fracciones} ${d.fracciones===1?"fracción":"fracciones"}${(m=>m?` · ⚓ ${esc(m.nombre)}`:"")(state.marinas.find(m=>m.id===bo.marinaId))}</div>
+      <div class="meta">${num(bo.esloraFt)} ft · ${mts(bo.esloraFt)} m · ${d.fracciones} ${d.fracciones===1?"fracción":"fracciones"}${(m=>m?` · ⚓ ${esc(m.nombre)}`:"")(state.marinas.find(m=>m.id===bo.marinaId))}${(bk=>bk&&bo.finOn?` · 🏦 ${esc(bk.nombre)}`:"")(bancoDe(bo))}</div>
       <div class="figures">
         <div class="fig"><div class="lbl">Precio</div><div class="val">${num(bo.precio)>0 ? usd(num(bo.precio)) : "—"}</div></div>
         <div class="fig"><div class="lbl">Seguro</div><div class="val">${num(bo.seguroPct)}<small>%</small></div></div>
@@ -855,9 +983,47 @@ function renderBarcos(){
 
 /* ---------- comparar ---------- */
 const ASIG = "__asig"; // modo: cada barco usa su marina asignada
+const OPT  = "__opt";  // modo: mejor marina y mejor banco para cada barco
+
+const CRITERIOS = [
+  { id:"total",    label:"Total anual",       badge:"◆ MENOR TOTAL ANUAL" },
+  { id:"pie",      label:"Por pie",           badge:"◆ MENOR COSTO POR PIE" },
+  { id:"dia",      label:"Por día de uso",    badge:"◆ MENOR POR DÍA DE USO" },
+  { id:"charter",  label:"Vs charter",        badge:"◆ MEJOR VS CHARTER" },
+  { id:"neto5pie", label:"Neto 5 años/pie",   badge:"◆ MENOR NETO 5A POR PIE" },
+];
+
+function metricaCriterio(x){
+  const c = state.criterio || "total";
+  const eslora = num(x.bo.esloraFt);
+  if (c === "pie")  return eslora > 0 ? x.d.total / eslora : null;
+  if (c === "dia"){ const dd = diasUsoDe(x.bo); return dd > 0 ? x.d.total / dd : null; }
+  if (c === "charter"){
+    const dd = diasUsoDe(x.bo), ch = num(x.bo.charterDia);
+    return (dd > 0 && ch > 0) ? (x.d.total / dd) / ch : null;
+  }
+  if (c === "neto5pie") return eslora > 0 ? x.p.neto / eslora : null;
+  return x.d.total;
+}
+/** Set de índices ganadores bajo el criterio activo (solo barcos con precio; requiere ≥2 comparables; incluye empates). */
+function mejoresIdx(rows){
+  const vals = rows.map(x => num(x.bo.precio) > 0 ? metricaCriterio(x) : null);
+  const validos = vals.filter(v => v !== null);
+  if (validos.length < 2) return new Set();
+  const min = Math.min(...validos);
+  return new Set(vals.map((v,i) => v !== null && v === min ? i : -1).filter(i => i >= 0));
+}
+/** Mínimo por fila: set de índices (con precio, ≥2 valores, empates incluidos). */
+function minRow(rows, get){
+  const vals = rows.map(x => num(x.bo.precio) > 0 ? get(x) : null);
+  const validos = vals.filter(v => v !== null && Number.isFinite(v));
+  if (validos.length < 2) return new Set();
+  const min = Math.min(...validos);
+  return new Set(vals.map((v,i) => v !== null && v === min ? i : -1).filter(i => i >= 0));
+}
 
 function marinaSeleccionada(){
-  if (state.marinaSel === ASIG) return null;
+  if (state.marinaSel === ASIG || state.marinaSel === OPT) return null;
   // respeta la selección del usuario; solo re-elige si la marina ya no existe
   let m = state.marinas.find(x => x.id === state.marinaSel);
   if (!m){
@@ -867,44 +1033,66 @@ function marinaSeleccionada(){
   return m;
 }
 
+/** Calcula la fila completa de cada barco según el modo actual. */
+function calcularFilas(){
+  const modo = state.marinaSel;
+  const mSel = marinaSeleccionada();
+  return state.barcos.map(bo => {
+    let marina = null, banco = null;
+    if (modo === ASIG){ marina = state.marinas.find(m => m.id === bo.marinaId) || null; banco = bo.finOn ? bancoDe(bo) : null; }
+    else if (modo === OPT){ marina = mejorMarinaPara(bo); banco = bo.finOn ? (mejorBancoPara(bo) || bancoDe(bo)) : null; }
+    else { marina = mSel; banco = bo.finOn ? bancoDe(bo) : null; }
+    const fp = finParams(bo, banco);
+    const d = desglose(bo, marina, fp);
+    const p = proyeccion5(bo, d);
+    return { bo, marina, banco, d, p };
+  });
+}
+
 function renderComparar(){
-  const chips = $("marina-chips"), body = $("comparar-body"), sub = $("comparar-sub");
+  const chips = $("marina-chips"), critChips = $("criterio-chips"), body = $("comparar-body"), sub = $("comparar-sub");
   if (!state.barcos.length || !state.marinas.length){
-    chips.innerHTML = "";
+    chips.innerHTML = ""; critChips.innerHTML = "";
     sub.textContent = "";
     body.innerHTML = `<div class="empty">Para comparar necesitas al menos <b>un barco</b> y <b>una marina con tarifa</b>.<br>Agrégalos en las pestañas de abajo.</div>`;
     return;
   }
-  const modoAsig = state.marinaSel === ASIG;
+  const modo = state.marinaSel;
   const mSel = marinaSeleccionada();
-  chips.innerHTML = `<button class="chip ${modoAsig?"active":""}" data-act="pick-marina" data-id="${ASIG}">⚓ Marina asignada</button>` +
+  chips.innerHTML =
+    `<button class="chip ${modo===OPT?"active":""}" data-act="pick-marina" data-id="${OPT}">✦ Óptimo</button>` +
+    `<button class="chip ${modo===ASIG?"active":""}" data-act="pick-marina" data-id="${ASIG}">⚓ Marina asignada</button>` +
     state.marinas.map(m => {
       const t = tarifaResumen(m);
-      return `<button class="chip ${!modoAsig && m.id===state.marinaSel?"active":""}" data-act="pick-marina" data-id="${esc(m.id)}">
+      return `<button class="chip ${modo!==ASIG && modo!==OPT && m.id===state.marinaSel?"active":""}" data-act="pick-marina" data-id="${esc(m.id)}">
         ${esc(m.nombre)}${t?` <span class="r">· ${t}</span>`:" <span class='r'>· sin tarifa</span>"}
       </button>`;
     }).join("");
+  critChips.innerHTML = `<span class="crit-label">Destacar por</span>` +
+    CRITERIOS.map(c => `<button class="chip ${state.criterio===c.id?"active":""}" data-act="pick-criterio" data-id="${c.id}">${c.label}</button>`).join("");
 
-  // marinaDe(bo): la marina con la que se calcula cada barco en el modo actual
-  const marinaDe = bo => modoAsig ? (state.marinas.find(m => m.id === bo.marinaId) || null) : mSel;
-  const conTarifa = modoAsig
-    ? state.barcos.some(bo => { const m = marinaDe(bo); return m && costoMarinaAnual(m, 1) !== null; })
-    : (mSel && costoMarinaAnual(mSel, 1) !== null);
-  sub.textContent = modoAsig ? "cada barco con su marina asignada" : (conTarifa ? `En ${mSel.nombre}, por año` : "");
+  const rows = calcularFilas();
+  const conTarifa = rows.some(x => x.marina && costoMarinaAnual(x.marina, 1) !== null);
+  sub.textContent = modo === OPT ? "mejor marina y mejor banco para cada barco"
+    : modo === ASIG ? "cada barco con su marina asignada"
+    : (conTarifa ? `En ${mSel.nombre}, por año` : "");
 
   let html = "";
   if (!conTarifa){
-    if (modoAsig){
+    if (modo === ASIG){
       html += `<div class="empty">Ningún barco tiene una <b>marina asignada con tarifas</b>.<br>Edita un barco y elige su marina, o captura tarifas en la pestaña Marinas.</div>`;
+    } else if (modo === OPT){
+      html += `<div class="empty">Ninguna marina tiene tarifas capturadas, así que no hay óptimo que calcular.<br>Captura tarifas en la pestaña Marinas.</div>`;
     } else {
       html += mSel
         ? `<div class="empty"><b>${esc(mSel.nombre)}</b> aún no tiene tarifas capturadas.<br>Captura su tarifa por pie para incluirla en la comparativa.<br><br><button class="btn btn-brass" data-act="edit-marina" data-id="${esc(mSel.id)}">Capturar tarifas</button></div>`
         : `<div class="empty">Ninguna marina tiene tarifas todavía.<br>Edita una marina y captura su <b>tarifa por pie</b> para ver la comparativa.</div>`;
     }
   } else {
-    html += tablaComparativa(marinaDe, modoAsig);
-    html += graficaTotales(marinaDe, modoAsig ? "marina asignada" : mSel.nombre);
-    html += proyeccionTabla(marinaDe);
+    const mostrarSel = modo === OPT || modo === ASIG;
+    html += tablaComparativa(rows, mostrarSel);
+    html += graficaTotales(rows, modo === OPT ? "combinación óptima" : modo === ASIG ? "marina asignada" : mSel.nombre);
+    html += proyeccionTabla(rows);
   }
   if (state.marinas.filter(m => costoMarinaAnual(m,1)!==null).length > 1){
     html += matrizMarinas();
@@ -925,32 +1113,32 @@ function conceptosPersonalizados(barcos){
   </tr>`).join("");
 }
 
-function tablaComparativa(marinaDe, modoAsig){
-  const barcos = state.barcos;
-  const ds = barcos.map(bo => desglose(bo, marinaDe(bo)));
-  // resaltados solo entre barcos con precio capturado; requiere al menos 2 para comparar.
-  // Empates: se marcan todos los que igualan el mínimo (consistente con gráfica y matriz).
-  const validos = ds.map((d,i)=>({d,i})).filter(x => num(barcos[x.i].precio) > 0);
-  const mejorTotal = validos.length >= 2 ? Math.min(...validos.map(x=>x.d.total)) : null;
-  const mejorFrac  = validos.length >= 2 ? Math.min(...validos.map(x=>x.d.porFraccionAnual)) : null;
-  const esMejor  = i => mejorTotal !== null && num(barcos[i].precio) > 0 && ds[i].total === mejorTotal;
-  const esMejorF = i => mejorFrac !== null && num(barcos[i].precio) > 0 && ds[i].porFraccionAnual === mejorFrac;
+function tablaComparativa(rows, mostrarSel){
+  const barcos = rows.map(x => x.bo);
+  const ds = rows.map(x => x.d);
+  const badge = CRITERIOS.find(c => c.id === (state.criterio || "total"))?.badge ?? "◆";
+  const ganadores = mejoresIdx(rows);
+  const bTotal = minRow(rows, x => x.d.total);
+  const bPie   = minRow(rows, x => num(x.bo.esloraFt) > 0 ? x.d.total/num(x.bo.esloraFt) : null);
+  const bDia   = minRow(rows, x => { const dd = diasUsoDe(x.bo); return dd > 0 ? x.d.total/dd : null; });
+  const bChar  = minRow(rows, x => { const dd = diasUsoDe(x.bo), ch = num(x.bo.charterDia); return (dd>0 && ch>0) ? (x.d.total/dd)/ch : null; });
+  const bFrac  = minRow(rows, x => x.d.porFraccionAnual);
 
-  const fila = (lbl, note, get) => `<tr>
+  const fila = (lbl, note, get, bestSet) => `<tr>
     <td><span class="lbl">${lbl}</span>${note?`<span class="note">${note}</span>`:""}</td>
     ${ds.map((d,i)=>{ const v = get(d, barcos[i]);
-      return v === null ? `<td class="na">—</td>` : `<td>${v}</td>`;
+      return v === null ? `<td class="na">—</td>` : `<td class="${bestSet?.has(i)?'best':''}">${v}</td>`;
     }).join("")}
   </tr>`;
 
   return `<div class="table-wrap"><table class="ledger">
     <thead><tr>
       <th>Concepto</th>
-      ${barcos.map((bo,i)=>`<th>${esc(bo.nombre)}
-        <span class="sub">${num(bo.esloraFt)} ft · ${mts(bo.esloraFt)} m</span>
-        ${modoAsig?`<span class="sub">⚓ ${esc(marinaDe(bo)?.nombre ?? "sin marina asignada")}</span>`:""}
-        ${num(bo.precio)<=0?`<span class="flag">PRECIO PENDIENTE</span>`:""}
-        ${esMejor(i)?`<span class="badge-best">◆ MENOR TOTAL ANUAL</span>`:""}
+      ${rows.map((x,i)=>`<th>${esc(x.bo.nombre)}
+        <span class="sub">${num(x.bo.esloraFt)} ft · ${mts(x.bo.esloraFt)} m</span>
+        ${mostrarSel?`<span class="sub">⚓ ${esc(x.marina?.nombre ?? "sin marina")}${x.bo.finOn && x.banco ? ` · 🏦 ${esc(x.banco.nombre)}` : ""}</span>`:""}
+        ${num(x.bo.precio)<=0?`<span class="flag">PRECIO PENDIENTE</span>`:""}
+        ${ganadores.has(i)?`<span class="badge-best">${badge}</span>`:""}
       </th>`).join("")}
     </tr></thead>
     <tbody>
@@ -964,56 +1152,61 @@ function tablaComparativa(marinaDe, modoAsig){
       ${conceptosPersonalizados(barcos)}
       ${ds.some(d=>d.gestion>0) ? fila("Cuota de gestión","% sobre operación",(d,bo)=> num(bo.gestionPct)>0 ? usd(d.gestion) : usd(0)) : ""}
       ${fila("Financiamiento","cuota anual del crédito",(d,bo)=> bo.finOn ? (num(bo.precio)>0 ? usd(d.fin) : null) : usd(0))}
-      <tr class="total"><td><span class="lbl">TOTAL ANUAL</span></td>${ds.map((d,i)=>`<td class="${esMejor(i)?'best':''}">${usd(d.total)}</td>`).join("")}</tr>
+      <tr class="total"><td><span class="lbl">TOTAL ANUAL</span></td>${ds.map((d,i)=>`<td class="${bTotal.has(i)?'best':''}">${usd(d.total)}</td>`).join("")}</tr>
       <tr><td><span class="lbl">Total mensual</span></td>${ds.map(d=>`<td>${usd(d.total/12)}</td>`).join("")}</tr>
+      ${fila("Costo por pie · año","total ÷ eslora — compara tamaños distintos",(d,bo)=> num(bo.esloraFt)>0 ? usd(d.total/num(bo.esloraFt)) : null, bPie)}
+      ${barcos.some(bo=>diasUsoDe(bo)>0) ? fila("Costo por día de uso","total ÷ días de uso del barco",(d,bo)=>{
+        const dd = diasUsoDe(bo); return dd>0 ? usd(d.total/dd) : null; }, bDia) : ""}
+      ${barcos.some(bo=>num(bo.charterDia)>0) ? fila("Charter equivalente","tarifa de mercado por día",(d,bo)=> num(bo.charterDia)>0 ? usd(num(bo.charterDia)) : null) : ""}
+      ${barcos.some(bo=>num(bo.charterDia)>0 && diasUsoDe(bo)>0) ? fila("Costo vs charter","costo por día como % del charter",(d,bo)=>{
+        const dd = diasUsoDe(bo), ch = num(bo.charterDia);
+        return (dd>0 && ch>0) ? `${Math.round((d.total/dd)/ch*100)}%` : null; }, bChar) : ""}
       ${barcos.some(bo=>num(bo.precioFraccion)>0 || num(bo.precio)>0) ? `<tr class="fraction"><td><span class="lbl">Inversión por fracción</span><span class="note">precio del programa, o precio ÷ fracciones</span></td>${ds.map((d,i)=>{
         const bo = barcos[i];
         const inv = num(bo.precioFraccion)>0 ? num(bo.precioFraccion) : (num(bo.precio)>0 ? num(bo.precio)/d.fracciones : null);
         return inv===null ? `<td class="na">—</td>` : `<td>${usd(inv)} <small>/${d.fracciones}</small></td>`;
       }).join("")}</tr>` : ""}
-      <tr class="fraction"><td><span class="lbl">Por fracción · año</span><span class="note">entre n.º de fracciones</span></td>${ds.map((d,i)=>`<td class="${esMejorF(i)?'best':''}">${usd(d.porFraccionAnual)} <small>/${d.fracciones}</small></td>`).join("")}</tr>
+      <tr class="fraction"><td><span class="lbl">Por fracción · año</span><span class="note">entre n.º de fracciones</span></td>${ds.map((d,i)=>`<td class="${bFrac.has(i)?'best':''}">${usd(d.porFraccionAnual)} <small>/${d.fracciones}</small></td>`).join("")}</tr>
       <tr class="fraction"><td><span class="lbl">Por fracción · mes</span></td>${ds.map(d=>`<td>${usd(d.porFraccionAnual/12)}</td>`).join("")}</tr>
-      ${barcos.some(bo=>num(bo.diasFraccion)>0) ? `<tr class="fraction"><td><span class="lbl">Por día de uso</span><span class="note">cuota anual ÷ días de uso de la fracción</span></td>${ds.map((d,i)=>{
+      ${barcos.some(bo=>num(bo.diasFraccion)>0) ? `<tr class="fraction"><td><span class="lbl">Por día de uso · fracción</span><span class="note">cuota anual ÷ días de uso de la fracción</span></td>${ds.map((d,i)=>{
         const dias = num(barcos[i].diasFraccion);
         return dias>0 ? `<td>${usd(d.porFraccionAnual/dias)} <small>/día</small></td>` : `<td class="na">—</td>`;
       }).join("")}</tr>` : ""}
     </tbody>
   </table>
   </div>
-  <p class="hint">El total anual suma marina, seguro, mantenimiento, tripulación, combustible, otros y financiamiento. Desliza la tabla a los lados para ver todos los barcos. ◆ marca el menor total anual y la menor cuota por fracción (solo entre barcos con precio capturado).</p>`;
+  <p class="hint">El total anual suma marina, seguro, mantenimiento, tripulación, combustible, otros, conceptos adicionales, gestión y financiamiento. El distintivo de la cabecera sigue el criterio elegido en «Destacar por»; dentro de la tabla, ◆ marca el mínimo de cada fila comparable. Desliza la tabla a los lados para ver todos los barcos.</p>`;
 }
 
-function graficaTotales(marinaDe, titulo){
-  const barcos = state.barcos;
-  if (barcos.length < 2) return "";
-  const ds = barcos.map(bo => ({ bo, d: desglose(bo, marinaDe(bo)) }));
-  const max = Math.max(...ds.map(x => x.d.total), 1);
-  const conPrecio = ds.filter(x=>num(x.bo.precio)>0);
-  const min = conPrecio.length >= 2 ? Math.min(...conPrecio.map(x => x.d.total)) : Infinity;
+function graficaTotales(rows, titulo){
+  if (rows.length < 2) return "";
+  const ganadores = mejoresIdx(rows);
+  const max = Math.max(...rows.map(x => x.d.total), 1);
   return `<div class="chart"><h3>Total anual por barco — ${esc(titulo)}</h3>
-    ${ds.map(({bo,d}) => {
-      const sinPrecio = num(bo.precio) <= 0;
-      return `<div class="bar-row ${!sinPrecio && d.total===min ? "best":""} ${sinPrecio ? "pending":""}">
-      <span class="name">${esc(bo.nombre)}${sinPrecio ? `<small class="pend">precio pendiente</small>` : ""}</span>
-      <div class="bar-track"><div class="bar-fill" style="width:${Math.max(2,(d.total/max*100)).toFixed(1)}%"></div></div>
-      <span class="amt">${usd(d.total)}</span>
+    ${rows.map((x,i) => {
+      const sinPrecio = num(x.bo.precio) <= 0;
+      return `<div class="bar-row ${!sinPrecio && ganadores.has(i) ? "best":""} ${sinPrecio ? "pending":""}">
+      <span class="name">${esc(x.bo.nombre)}${sinPrecio ? `<small class="pend">precio pendiente</small>` : ""}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.max(2,(x.d.total/max*100)).toFixed(1)}%"></div></div>
+      <span class="amt">${usd(x.d.total)}</span>
     </div>`;}).join("")}
+    <p class="hint" style="margin-bottom:0">Las barras muestran el total anual; el verde marca al ganador del criterio «${esc(CRITERIOS.find(c=>c.id===(state.criterio||"total"))?.label ?? "")}» — puede no ser la barra más corta.</p>
   </div>`;
 }
 
-function proyeccionTabla(marinaDe){
-  const barcos = state.barcos;
-  const rows = barcos.map(bo => { const d = desglose(bo, marinaDe(bo)); return { bo, d, p: proyeccion5(bo, d) }; });
-  const validos = rows.filter(x => num(x.bo.precio) > 0);
-  const mejorNeto = validos.length >= 2 ? Math.min(...validos.map(x => x.p.neto)) : null;
-  const best = x => mejorNeto !== null && num(x.bo.precio) > 0 && x.p.neto === mejorNeto;
+function proyeccionTabla(rows){
+  const badgeNeto = (state.criterio === "pie" || state.criterio === "neto5pie");
+  const bNeto = minRow(rows, x => x.p.neto);
+  const bNetoPie = minRow(rows, x => num(x.bo.esloraFt) > 0 ? x.p.neto/num(x.bo.esloraFt) : null);
+  const ganadores = badgeNeto ? bNetoPie : bNeto;
+  const badge = badgeNeto ? "◆ MENOR NETO POR PIE" : "◆ MENOR COSTO NETO";
   const conSaldo = rows.some(x => x.p.saldo > 0);
   return `<div class="section-head" style="margin-top:26px"><h2>Proyección a 5 años</h2><span class="sub">adquisición + operación − reventa</span></div>
   <div class="rule"></div>
   <div class="table-wrap"><table class="ledger">
-    <thead><tr><th>Concepto</th>${rows.map(x=>`<th>${esc(x.bo.nombre)}
+    <thead><tr><th>Concepto</th>${rows.map((x,i)=>`<th>${esc(x.bo.nombre)}
       ${num(x.bo.precio)<=0?`<span class="flag">PRECIO PENDIENTE</span>`:""}
-      ${best(x)?`<span class="badge-best">◆ MENOR COSTO NETO</span>`:""}</th>`).join("")}</tr></thead>
+      ${ganadores.has(i)?`<span class="badge-best">${badge}</span>`:""}</th>`).join("")}</tr></thead>
     <tbody>
       <tr><td><span class="lbl">Adquisición pagada</span><span class="note">contado, o enganche + cuotas de 5 años</span></td>
         ${rows.map(x=> num(x.bo.precio)>0 ? `<td>${usd(x.p.pagado)}</td>` : `<td class="na">—</td>`).join("")}</tr>
@@ -1023,13 +1216,38 @@ function proyeccionTabla(marinaDe){
       <tr><td><span class="lbl">Reventa estimada año 5</span><span class="note">según % de depreciación</span></td>
         ${rows.map(x=> num(x.bo.precio)>0 ? `<td>− ${usd(x.p.reventa)}</td>` : `<td class="na">—</td>`).join("")}</tr>
       <tr class="total"><td><span class="lbl">COSTO NETO 5 AÑOS</span></td>
-        ${rows.map(x=>`<td class="${best(x)?'best':''}">${usd(x.p.neto)}</td>`).join("")}</tr>
+        ${rows.map((x,i)=>`<td class="${bNeto.has(i)?'best':''}">${usd(x.p.neto)}</td>`).join("")}</tr>
+      <tr><td><span class="lbl">Neto 5 años por pie</span><span class="note">neto ÷ eslora — compara tamaños</span></td>
+        ${rows.map((x,i)=> num(x.bo.esloraFt)>0 ? `<td class="${bNetoPie.has(i)?'best':''}">${usd(x.p.neto/num(x.bo.esloraFt))}</td>` : `<td class="na">—</td>`).join("")}</tr>
       <tr class="fraction"><td><span class="lbl">Por fracción · 5 años</span><span class="note">entre n.º de fracciones</span></td>
         ${rows.map(x=>`<td>${usd(x.p.porFraccion)} <small>/${x.d.fracciones}</small></td>`).join("")}</tr>
     </tbody>
   </table>
   </div>
   <p class="hint">Modelo del expediente BKI: lo pagado en 5 años (contado, o enganche + cuotas; más el saldo pendiente si el plazo excede 5 años) más la operación de 5 años, menos el valor estimado de reventa al año 5. Los barcos sin precio solo muestran operación.</p>`;
+}
+
+/* ---------- bancos ---------- */
+function renderBancos(){
+  const g = $("bancos-grid");
+  $("bancos-count").textContent = state.bancos.length ? `${state.bancos.length} ${state.bancos.length===1?"oferta":"ofertas"}` : "";
+  if (!state.bancos.length){
+    g.innerHTML = `<div class="empty" style="grid-column:1/-1">Aún no hay ofertas de financiamiento.<br><b>Agrega la primera</b> con su tasa, enganche y plazo.</div>`;
+    return;
+  }
+  g.innerHTML = state.bancos.map(bk => `<div class="card">
+      <h3>${esc(bk.nombre)}</h3>
+      <div class="meta">${esc(bk.nota || "—")}</div>
+      <div class="figures">
+        <div class="fig"><div class="lbl">Tasa</div><div class="val">${num(bk.tasaPct)}<small>% anual</small></div></div>
+        <div class="fig"><div class="lbl">Enganche</div><div class="val">${num(bk.engPct)}<small>%</small></div></div>
+        <div class="fig"><div class="lbl">Plazo</div><div class="val">${num(bk.plazoAnios)} <small>años</small></div></div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-ghost" data-act="edit-banco" data-id="${esc(bk.id)}">Editar</button>
+        <button class="btn btn-danger" data-act="del-banco" data-id="${esc(bk.id)}">Eliminar</button>
+      </div>
+    </div>`).join("");
 }
 
 function matrizMarinas(){
@@ -1056,6 +1274,41 @@ function matrizMarinas(){
    ACCIONES
    ============================================================ */
 function elegirMarina(id){ state.marinaSel = id; render(); }
+function elegirCriterio(id){ state.criterio = id; render(); }
+
+/* --- bancos --- */
+let editandoBanco = null;
+function abrirBanco(id){
+  editandoBanco = id || null;
+  const bk = id ? state.bancos.find(x=>x.id===id) : null;
+  $("dlg-banco-title").textContent = bk ? "Editar banco / oferta" : "Agregar banco / oferta";
+  $("k-nombre").value = bk?.nombre ?? "";
+  $("k-tasa").value   = bk?.tasaPct ?? "";
+  $("k-eng").value    = bk?.engPct ?? 20;
+  $("k-plazo").value  = bk?.plazoAnios ?? 5;
+  $("k-nota").value   = bk?.nota ?? "";
+  $("dlg-banco").showModal();
+}
+function guardarBanco(){
+  const datos = {
+    nombre: $("k-nombre").value.trim() || "Banco sin nombre",
+    tasaPct: clamp(num($("k-tasa").value), 0, 100),
+    engPct: clamp(num($("k-eng").value), 0, 100),
+    plazoAnios: clamp(num($("k-plazo").value), 1, 30) || 5,
+    nota: $("k-nota").value.trim(),
+  };
+  const existente = editandoBanco ? state.bancos.find(x=>x.id===editandoBanco) : null;
+  if (existente){ Object.assign(existente, datos); }
+  else { state.bancos.push({ id: uid(), ...datos }); }
+  render();
+}
+function borrarBanco(id){
+  const bk = state.bancos.find(x=>x.id===id);
+  if (!confirm(`¿Eliminar "${bk?.nombre}"?`)) return;
+  state.bancos = state.bancos.filter(x=>x.id!==id);
+  state.barcos.forEach(b => { if (b.bancoId === id) b.bancoId = null; });
+  render();
+}
 
 /* --- barcos --- */
 let editandoBarco = null;
@@ -1080,9 +1333,15 @@ function abrirBarco(id){
   $("b-gestion").value  = bo?.gestionPct ?? 0;
   $("b-pfrac").value    = bo && num(bo.precioFraccion)>0 ? bo.precioFraccion : 0;
   $("b-dias").value     = bo?.diasFraccion ?? 0;
+  $("b-diasuso").value  = bo?.diasUso ?? 0;
+  $("b-charter").value  = bo && num(bo.charterDia)>0 ? bo.charterDia : 0;
   $("b-marina").innerHTML = `<option value="">— Sin asignar —</option>` +
     state.marinas.map(m => `<option value="${esc(m.id)}">${esc(m.nombre)}</option>`).join("");
   $("b-marina").value = bo?.marinaId ?? "";
+  $("b-banco").innerHTML = `<option value="">— Parámetros manuales —</option>` +
+    state.bancos.map(bk => `<option value="${esc(bk.id)}">${esc(bk.nombre)} · ${num(bk.tasaPct)}% · ${num(bk.plazoAnios)}a</option>`).join("");
+  $("b-banco").value = bo?.bancoId ?? "";
+  actualizarBancoFields();
   $("extras-list").innerHTML = "";
   (bo?.extras ?? []).forEach(e => agregarExtraRow(e));
   actualizarFinFields(); actualizarEsloraHint();
@@ -1128,9 +1387,12 @@ function guardarBarco(){
     depPct5: clamp(num($("b-dep").value), 0, 100),
     fracciones: Math.max(1, Math.round(num($("b-frac").value) || 1)),
     marinaId: $("b-marina").value || null,
+    bancoId: $("b-banco").value || null,
     gestionPct: clamp(num($("b-gestion").value), 0, 100),
     precioFraccion: num($("b-pfrac").value),
     diasFraccion: clamp(num($("b-dias").value), 0, 365),
+    diasUso: clamp(num($("b-diasuso").value), 0, 365),
+    charterDia: num($("b-charter").value),
     extras: leerExtras(),
   };
   const existente = editandoBarco ? state.barcos.find(x=>x.id===editandoBarco) : null;
@@ -1233,19 +1495,30 @@ document.addEventListener("click", e => {
     case "del-barco":   borrarBarco(id); break;
     case "edit-marina": abrirMarina(id); break;
     case "del-marina":  borrarMarina(id); break;
+    case "edit-banco":  abrirBanco(id); break;
+    case "del-banco":   borrarBanco(id); break;
     case "pick-marina": elegirMarina(id); break;
+    case "pick-criterio": elegirCriterio(id); break;
   }
 });
 document.querySelectorAll("[data-close]").forEach(b => b.addEventListener("click", () => $(b.dataset.close).close()));
 
 $("btn-add-barco").addEventListener("click", () => abrirBarco(null));
 $("btn-add-marina").addEventListener("click", () => abrirMarina(null));
+$("btn-add-banco").addEventListener("click", () => abrirBanco(null));
 $("frm-barco").addEventListener("submit", guardarBarco);
 $("frm-marina").addEventListener("submit", guardarMarina);
+$("frm-banco").addEventListener("submit", guardarBanco);
 
 $("btn-add-extra").addEventListener("click", () => agregarExtraRow(null));
 $("b-fin-on").addEventListener("change", actualizarFinFields);
 function actualizarFinFields(){ $("fin-fields").classList.toggle("disabled", !$("b-fin-on").checked); }
+$("b-banco").addEventListener("change", actualizarBancoFields);
+function actualizarBancoFields(){
+  const bk = state.bancos.find(x => x.id === $("b-banco").value) || null;
+  ["b-fin-eng","b-fin-tasa","b-fin-plazo"].forEach(fid => { $(fid).disabled = !!bk; });
+  if (bk){ $("b-fin-eng").value = bk.engPct; $("b-fin-tasa").value = bk.tasaPct; $("b-fin-plazo").value = bk.plazoAnios; }
+}
 
 $("m-unidad").addEventListener("change", actualizarUnidadMarina);
 function actualizarUnidadMarina(){
