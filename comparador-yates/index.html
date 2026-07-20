@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
 <title>Comparador de Yates</title>
 <meta name="description" content="Compara el costo real de propiedad de tus yates: marinas, seguro, mantenimiento, tripulación y financiamiento.">
+<meta name="theme-color" content="#0B1D2C">
+<meta name="apple-mobile-web-app-title" content="Yates">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230B1D2C'/%3E%3Ctext x='32' y='45' font-size='34' text-anchor='middle'%3E%E2%9A%93%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -444,11 +447,16 @@ label.fld .cap small{font-weight:400;color:#7C8A97}
         </div>
       </fieldset>
       <fieldset>
-        <legend>Propiedad fraccional</legend>
-        <label class="fld" style="max-width:220px"><span class="cap">Número de fracciones</span>
-          <input type="number" id="b-frac" min="1" max="32" step="any" inputmode="numeric" value="8">
-        </label>
-        <p class="form-hint">El costo total se divide entre este número de propietarios.</p>
+        <legend>Proyección y propiedad fraccional</legend>
+        <div class="frm-grid">
+          <label class="fld"><span class="cap">Depreciación 5 años <small>(%)</small></span>
+            <input type="number" id="b-dep" min="0" max="100" step="any" inputmode="decimal" value="39.1">
+          </label>
+          <label class="fld"><span class="cap">Número de fracciones</span>
+            <input type="number" id="b-frac" min="1" max="32" step="any" inputmode="numeric" value="8">
+          </label>
+        </div>
+        <p class="form-hint">La depreciación estándar del mercado náutico ronda 39% acumulado al año 5. El costo total se divide entre el número de fracciones.</p>
       </fieldset>
     </div>
     <div class="dlg-foot">
@@ -566,6 +574,38 @@ function pagoAnualFinanciamiento(precio, engPct, tasaPct, plazoAnios){
   return cuota * 12;
 }
 
+/** Saldo insoluto del crédito después de k meses (amortización francesa). */
+function saldoCredito(precio, engPct, tasaPct, plazoAnios, kMeses){
+  const P = num(precio) * (1 - clamp(num(engPct),0,100)/100);
+  const n = Math.max(1, Math.round(num(plazoAnios))) * 12;
+  const k = Math.min(kMeses, n);
+  if (P <= 0) return 0;
+  const r = num(tasaPct)/100/12;
+  if (r === 0) return P * (n - k) / n;
+  const f = Math.pow(1 + r, n), g = Math.pow(1 + r, k);
+  return P * (f - g) / (f - 1);
+}
+
+/** Proyección a 5 años (60 meses): adquisición + operación − reventa (modelo del expediente BKI). */
+function proyeccion5(barco, d){
+  const precio = num(barco.precio);
+  const HORIZ = 60;
+  let pagado, saldo;
+  if (barco.finOn && precio > 0){
+    const enganche = precio * clamp(num(barco.finEngPct),0,100)/100;
+    const cuotaAnual = pagoAnualFinanciamiento(precio, barco.finEngPct, barco.finTasaPct, barco.finPlazo);
+    const nMeses = Math.max(1, Math.round(num(barco.finPlazo))) * 12;
+    pagado = Math.round(enganche + (cuotaAnual/12) * Math.min(HORIZ, nMeses));
+    saldo  = Math.round(saldoCredito(precio, barco.finEngPct, barco.finTasaPct, barco.finPlazo, HORIZ));
+  } else {
+    pagado = Math.round(precio); saldo = 0;
+  }
+  const operacion5 = d.operacion * 5;
+  const reventa = Math.round(precio * (1 - clamp(num(barco.depPct5),0,100)/100));
+  const neto = pagado + saldo + operacion5 - reventa;
+  return { pagado, saldo, operacion5, reventa, neto, porFraccion: neto / d.fracciones };
+}
+
 /** Desglose completo anual de un barco en una marina.
     Cada componente se redondea a dólares enteros ANTES de sumar,
     para que las filas mostradas siempre cuadren con el total. */
@@ -620,6 +660,7 @@ function normalizarEstado(d){
     tripMes: num(b.tripMes), combAnual: num(b.combAnual), otrosAnual: num(b.otrosAnual),
     finOn: !!b.finOn, finEngPct: num(b.finEngPct), finTasaPct: num(b.finTasaPct),
     finPlazo: num(b.finPlazo) || 10,
+    depPct5: b.depPct5 === undefined ? 39.1 : clamp(num(b.depPct5), 0, 100),
     fracciones: Math.max(1, Math.round(num(b.fracciones) || 1)),
   }));
   const marinaSel = marinas.some(m => m.id === d.marinaSel) ? d.marinaSel : (marinas[0]?.id ?? null);
@@ -641,11 +682,11 @@ function datosEjemplo(){
       b("b-bgm75","Bluegame BGM75",74.7,{ precio:10850000 }),        // precio público según Ricardo (chat 1/jul)
       b("b-sun76","Sunseeker 76 (2020) · Chinonino",77.4,{ precio:2000000 }), // contrato 29/jun/2026, pago a cierre
       b("b-sl86","Sanlorenzo SL86A (casco 878)",86,{ precio:11236100,
-        seguroPct:0.9, mantPct:2.3, tripMes:38903, combAnual:144496, otrosAnual:44460, finOn:true }),
+        seguroPct:0.9, mantPct:2.3, tripMes:38903, combAnual:144496, otrosAnual:44460, finOn:true, depPct5:39.8 }),
       b("b-sx88","Sanlorenzo SX88 (casco 162)",88,{ precio:10976000,
-        seguroPct:0.9, mantPct:2.3, tripMes:37930, combAnual:140881, otrosAnual:43348, finOn:true }),
+        seguroPct:0.9, mantPct:2.3, tripMes:37930, combAnual:140881, otrosAnual:43348, finOn:true, depPct5:39.9 }),
       b("b-sl90","Sanlorenzo SL90A (casco 868)",90,{ precio:12196300,
-        seguroPct:0.9, mantPct:2.3, tripMes:42236, combAnual:156875, otrosAnual:48269, finOn:true }),
+        seguroPct:0.9, mantPct:2.3, tripMes:42236, combAnual:156875, otrosAnual:48269, finOn:true, depPct5:39.8 }),
       b("b-sp92","Sanlorenzo SP92 (casco 21)",92,{ precio:12475000,  // ops estimadas con el mismo modelo BKI (10% del valor)
         seguroPct:0.9, mantPct:2.3, tripMes:43663, combAnual:162175, otrosAnual:49900 }),
       b("b-sl96","Sanlorenzo SL96A (2022) · fraccional",95.3,{ precio:7780000, // valor de mercado, programa 4 fracciones
@@ -656,7 +697,7 @@ function datosEjemplo(){
   function b(id,nombre,ft,extra){
     return { id, nombre, esloraFt:ft, precio:0, seguroPct:1.5, mantPct:10,
              tripMes:0, combAnual:0, otrosAnual:0,
-             finOn:false, finEngPct:20, finTasaPct:5.7, finPlazo:5, fracciones:8, ...extra };
+             finOn:false, finEngPct:20, finTasaPct:5.7, finPlazo:5, depPct5:39.1, fracciones:8, ...extra };
   }
 }
 
@@ -796,6 +837,7 @@ function renderComparar(){
   } else {
     html += tablaComparativa(mSel);
     html += graficaTotales(mSel);
+    html += proyeccionTabla(mSel);
   }
   if (state.marinas.filter(m => costoMarinaAnual(m,1)!==null).length > 1){
     html += matrizMarinas();
@@ -867,6 +909,37 @@ function graficaTotales(marina){
   </div>`;
 }
 
+function proyeccionTabla(marina){
+  const barcos = state.barcos;
+  const rows = barcos.map(bo => { const d = desglose(bo, marina); return { bo, d, p: proyeccion5(bo, d) }; });
+  const validos = rows.filter(x => num(x.bo.precio) > 0);
+  const mejorNeto = validos.length >= 2 ? Math.min(...validos.map(x => x.p.neto)) : null;
+  const best = x => mejorNeto !== null && num(x.bo.precio) > 0 && x.p.neto === mejorNeto;
+  const conSaldo = rows.some(x => x.p.saldo > 0);
+  return `<div class="section-head" style="margin-top:26px"><h2>Proyección a 5 años</h2><span class="sub">adquisición + operación − reventa</span></div>
+  <div class="rule"></div>
+  <div class="table-wrap"><table class="ledger">
+    <thead><tr><th>Concepto</th>${rows.map(x=>`<th>${esc(x.bo.nombre)}
+      ${num(x.bo.precio)<=0?`<span class="flag">PRECIO PENDIENTE</span>`:""}
+      ${best(x)?`<span class="badge-best">◆ MENOR COSTO NETO</span>`:""}</th>`).join("")}</tr></thead>
+    <tbody>
+      <tr><td><span class="lbl">Adquisición pagada</span><span class="note">contado, o enganche + cuotas de 5 años</span></td>
+        ${rows.map(x=> num(x.bo.precio)>0 ? `<td>${usd(x.p.pagado)}</td>` : `<td class="na">—</td>`).join("")}</tr>
+      ${conSaldo ? `<tr><td><span class="lbl">Saldo del crédito al año 5</span></td>${rows.map(x=>`<td>${usd(x.p.saldo)}</td>`).join("")}</tr>` : ""}
+      <tr><td><span class="lbl">Operación 5 años</span><span class="note">marina + costos anuales × 5</span></td>
+        ${rows.map(x=>`<td>${usd(x.p.operacion5)}</td>`).join("")}</tr>
+      <tr><td><span class="lbl">Reventa estimada año 5</span><span class="note">según % de depreciación</span></td>
+        ${rows.map(x=> num(x.bo.precio)>0 ? `<td>− ${usd(x.p.reventa)}</td>` : `<td class="na">—</td>`).join("")}</tr>
+      <tr class="total"><td><span class="lbl">COSTO NETO 5 AÑOS</span></td>
+        ${rows.map(x=>`<td class="${best(x)?'best':''}">${usd(x.p.neto)}</td>`).join("")}</tr>
+      <tr class="fraction"><td><span class="lbl">Por fracción · 5 años</span><span class="note">entre n.º de fracciones</span></td>
+        ${rows.map(x=>`<td>${usd(x.p.porFraccion)} <small>/${x.d.fracciones}</small></td>`).join("")}</tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="hint">Modelo del expediente BKI: lo pagado en 5 años (contado, o enganche + cuotas; más el saldo pendiente si el plazo excede 5 años) más la operación de 5 años, menos el valor estimado de reventa al año 5. Los barcos sin precio solo muestran operación.</p>`;
+}
+
 function matrizMarinas(){
   const marinas = state.marinas.filter(m => costoMarinaAnual(m,1) !== null);
   const barcos = state.barcos;
@@ -910,6 +983,7 @@ function abrirBarco(id){
   $("b-fin-eng").value  = bo?.finEngPct ?? 20;
   $("b-fin-tasa").value = bo?.finTasaPct ?? 5.7;
   $("b-fin-plazo").value= bo?.finPlazo ?? 5;
+  $("b-dep").value      = bo?.depPct5 ?? 39.1;
   $("b-frac").value     = bo?.fracciones ?? 8;
   actualizarFinFields(); actualizarEsloraHint();
   $("dlg-barco").showModal();
@@ -928,6 +1002,7 @@ function guardarBarco(){
     finEngPct: num($("b-fin-eng").value),
     finTasaPct: num($("b-fin-tasa").value),
     finPlazo: num($("b-fin-plazo").value),
+    depPct5: clamp(num($("b-dep").value), 0, 100),
     fracciones: Math.max(1, Math.round(num($("b-frac").value) || 1)),
   };
   const existente = editandoBarco ? state.barcos.find(x=>x.id===editandoBarco) : null;
