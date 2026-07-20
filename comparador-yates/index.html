@@ -856,21 +856,21 @@ function datosEjemplo(){
       /* Datos reales tomados de los documentos de Ricardo (expedientes BKI rev. 2/3/2026,
          listas de precios Sanlorenzo Americas, contratos de compraventa, programa fraccional
          SL96A y memorándum de crédito: 20% enganche · 5.7% anual · 60 meses). */
-      b("b-sol70","Solaris 70 Long Range",70,{ precio:4048720, marinaId:"m-lapaz" }), // asking 2026, Solaris Power Florida (YachtWay, jul 2026)
-      b("b-bgm75","Bluegame BGM75",74.7,{ precio:10850000, marinaId:"m-ftl" }), // precio público según Ricardo (chat 1/jul)
-      b("b-sun76","Sunseeker 76 (2020) · Chinonino",77.4,{ precio:2000000, marinaId:"m-lapaz" }), // contrato 29/jun/2026
+      b("b-sol70","Solaris 70 Long Range",70,{ precio:4048720, marinaId:"m-lapaz", charterDia:7000 }), // precio: asking 2026 (YachtWay); charter: clase Pershing 70/7X ~$49k/sem (YCF, proxy)
+      b("b-bgm75","Bluegame BGM75",74.7,{ precio:10850000, marinaId:"m-ftl", charterDia:5700 }), // precio público según Ricardo (chat 1/jul); charter: Kimani/BG74 ~$40k/sem (YCF/Boatcrowd)
+      b("b-sun76","Sunseeker 76 (2020) · Chinonino",77.4,{ precio:2000000, marinaId:"m-lapaz", charterDia:7700 }), // contrato 29/jun/2026; charter: Milamo/Saahsa ~$54k/sem (YCF)
       b("b-sl86","Sanlorenzo SL86A (casco 878)",86,{ precio:11236100, marinaId:"m-ftl", bancoId:"bk-memo",
-        seguroPct:0.9, mantPct:2.3, tripMes:38903, combAnual:144496, otrosAnual:44460, finOn:true, depPct5:39.8 }),
+        seguroPct:0.9, mantPct:2.3, tripMes:38903, combAnual:144496, otrosAnual:44460, finOn:true, depPct5:39.8, charterDia:12300 }), // charter: SL86A nuevos ~$86k/sem (YCF)
       b("b-sx88","Sanlorenzo SX88 (casco 162)",88,{ precio:10976000, marinaId:"m-ftl", bancoId:"bk-memo",
-        seguroPct:0.9, mantPct:2.3, tripMes:37930, combAnual:140881, otrosAnual:43348, finOn:true, depPct5:39.9 }),
+        seguroPct:0.9, mantPct:2.3, tripMes:37930, combAnual:140881, otrosAnual:43348, finOn:true, depPct5:39.9, charterDia:11400 }), // charter: SX88 rep $80k/sem (YCF)
       b("b-sl90","Sanlorenzo SL90A (casco 868)",90,{ precio:12196300, marinaId:"m-ftl", bancoId:"bk-memo",
-        seguroPct:0.9, mantPct:2.3, tripMes:42236, combAnual:156875, otrosAnual:48269, finOn:true, depPct5:39.8 }),
+        seguroPct:0.9, mantPct:2.3, tripMes:42236, combAnual:156875, otrosAnual:48269, finOn:true, depPct5:39.8, charterDia:13100 }), // charter: SL90A 2025-26 ~$92k/sem (YCF)
       b("b-sp92","Sanlorenzo SP92 (casco 21)",92,{ precio:12475000, marinaId:"m-ftl", // ops con el modelo BKI (10% del valor)
-        seguroPct:0.9, mantPct:2.3, tripMes:43663, combAnual:162175, otrosAnual:49900 }),
+        seguroPct:0.9, mantPct:2.3, tripMes:43663, combAnual:162175, otrosAnual:49900, charterDia:13100 }), // charter: proxy clase SL90A (sin listados SP92)
       b("b-sl96","Sanlorenzo SL96A (2022) · fraccional",95.3,{ precio:7780000, marinaId:"m-ftl",
         // programa fraccional real: 4 fracciones de $1,945,000, 10% de gestión, 40-60 días de uso (25%)
         seguroPct:1.18, mantPct:2.89, tripMes:39583, combAnual:20000, otrosAnual:54500,
-        fracciones:4, gestionPct:10, precioFraccion:1945000, diasFraccion:50 }),
+        fracciones:4, gestionPct:10, precioFraccion:1945000, diasFraccion:50, charterDia:12700 }), // charter: SL96/96A mediana $89k/sem (YCF)
     ],
     marinaSel: "__asig",
     criterio: "total",
