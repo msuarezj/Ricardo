@@ -149,9 +149,9 @@ main{max-width:1080px;margin:0 auto;padding:18px 20px 40px}
 .card .meta{font-size:12.5px;color:#5B6B7A;margin-top:2px}
 .card .figures{margin-top:12px;display:flex;flex-wrap:wrap;gap:8px 18px}
 .fig{min-width:86px}
-.fig .lbl{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#7C8A97}
+.fig .lbl{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#5E6D7A}
 .fig .val{font-size:16px;font-weight:600;font-variant-numeric:tabular-nums}
-.fig .val small{font-size:11px;color:#7C8A97;font-weight:500}
+.fig .val small{font-size:11px;color:#5E6D7A;font-weight:500}
 .card .actions{margin-top:14px;display:flex;gap:8px;position:relative;z-index:1}
 .chip-warn{
   display:inline-block;margin-top:8px;font-size:11.5px;font-weight:600;color:var(--coral);
@@ -193,6 +193,7 @@ main{max-width:1080px;margin:0 auto;padding:18px 20px 40px}
   box-shadow:0 6px 18px -8px rgba(194,161,90,.7);
 }
 .marina-chips .chip .r{font-weight:500;opacity:.75;font-size:12px}
+@media(max-width:560px){.marina-chips .chip .r{display:none}} /* en móvil, chips compactos: solo el nombre */
 .crit-chips{margin-top:-8px}
 .crit-chips .crit-label{
   align-self:center;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
@@ -221,8 +222,12 @@ table.ledger td:first-child, table.ledger th:first-child{
   border-right:1px solid var(--paper-line);max-width:190px;white-space:normal;
 }
 table.ledger thead th:first-child{background:var(--navy-800);z-index:3}
+@media(max-width:560px){
+  table.ledger td:first-child, table.ledger th:first-child{max-width:130px}
+  table.ledger th,table.ledger td{padding:9px 10px;font-size:12.5px}
+}
 table.ledger td:first-child .lbl{font-weight:600}
-table.ledger td:first-child .note{display:block;font-size:11px;color:#7C8A97;font-weight:400}
+table.ledger td:first-child .note{display:block;font-size:11px;color:#5E6D7A;font-weight:400}
 table.ledger tr.total td{
   background:var(--paper-dim);font-weight:700;font-size:14.5px;
   border-top:2px solid var(--brass);border-bottom:none;
@@ -230,9 +235,19 @@ table.ledger tr.total td{
 table.ledger tr.fraction td{background:rgba(46,125,100,.07);font-weight:600}
 table.ledger tr.total td:first-child{background:var(--paper-dim)}
 table.ledger tr.fraction td:first-child{background:#EBF0E7}
+/* zebra + hover para rastrear filas en una tabla ancha */
+table.ledger tbody tr:nth-child(even) td{background:#FBF8F0}
+table.ledger tbody tr:nth-child(even) td:first-child{background:#F2ECDD}
+table.ledger tbody tr.total td,table.ledger tbody tr.total td:first-child{background:var(--paper-dim)}
+table.ledger tbody tr.fraction td{background:rgba(46,125,100,.07)}
+table.ledger tbody tr.fraction td:first-child{background:#EBF0E7}
+@media(hover:hover){
+  table.ledger tbody tr:hover td{background:#F3ECD9}
+  table.ledger tbody tr:hover td:first-child{background:#EAE0C8}
+}
 table.ledger td.best{color:var(--sea-green);font-weight:700;position:relative}
 table.ledger td.best::before{content:"◆ ";font-size:9px;vertical-align:2px}
-table.ledger td.na{color:#A9B4BE}
+table.ledger td.na{color:#8B97A2}
 .badge-best{
   display:inline-block;font-family:var(--font-body);font-size:10px;font-weight:700;letter-spacing:.06em;
   color:#0E3A2C;background:var(--sea-green-soft);border-radius:999px;padding:2px 8px;margin-top:4px;
@@ -241,8 +256,9 @@ table.ledger td.na{color:#A9B4BE}
 /* bar chart */
 .chart{background:var(--paper);border-radius:var(--radius);box-shadow:var(--shadow-md);padding:18px;color:var(--ink);margin-top:16px}
 .chart h3{font-family:var(--font-display);font-size:17px;margin-bottom:12px}
-.bar-row{display:grid;grid-template-columns:minmax(90px,150px) 1fr auto;gap:10px;align-items:center;margin:7px 0}
+.bar-row{display:grid;grid-template-columns:minmax(120px,210px) 1fr auto;gap:10px;align-items:center;margin:7px 0}
 .bar-row .name{font-size:12.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:560px){.bar-row{grid-template-columns:1fr auto;gap:4px 10px}.bar-row .name{grid-column:1/-1;white-space:normal}}
 .bar-track{background:rgba(21,36,51,.07);border-radius:6px;height:22px;overflow:hidden}
 .bar-fill{
   height:100%;border-radius:6px;min-width:3px;
@@ -254,7 +270,8 @@ table.ledger td.na{color:#A9B4BE}
 .bar-row .pend{display:block;font-size:10px;font-weight:700;letter-spacing:.03em;color:var(--coral)}
 .bar-row .amt{font-size:12.5px;font-weight:700;font-variant-numeric:tabular-nums}
 .hint{font-size:12.5px;color:var(--mist);margin-top:10px;line-height:1.5}
-.hint-paper{font-size:12px;color:#7C8A97;padding:10px 14px 12px;line-height:1.5}
+.chart .hint{color:#5E6D7A} /* --mist es para fondo navy; dentro del chart (papel) baja contraste */
+.hint-paper{font-size:12px;color:#5E6D7A;padding:10px 14px 12px;line-height:1.5}
 
 /* ---------- dialogs / forms ---------- */
 dialog{
@@ -271,7 +288,7 @@ body:has(dialog[open]){overflow:hidden}
   position:sticky;top:0;background:var(--paper);z-index:2;
 }
 .dlg-head h3{font-family:var(--font-display);font-size:21px;font-weight:600}
-.dlg-close{appearance:none;border:none;background:none;font-size:22px;line-height:1;cursor:pointer;color:#7C8A97;padding:4px 8px}
+.dlg-close{appearance:none;border:none;background:none;font-size:22px;line-height:1;cursor:pointer;color:#5E6D7A;padding:4px 8px}
 .dlg-body{padding:16px 20px 8px;max-height:70vh;overflow-y:auto;overscroll-behavior:contain}
 .dlg-foot{
   padding:14px 20px calc(16px + env(safe-area-inset-bottom,0px));
@@ -287,7 +304,7 @@ fieldset legend{
 .frm-grid .full{grid-column:1/-1}
 label.fld{display:block}
 label.fld .cap{font-size:12.5px;font-weight:600;margin-bottom:4px;display:block}
-label.fld .cap small{font-weight:400;color:#7C8A97}
+label.fld .cap small{font-weight:400;color:#5E6D7A}
 .fld input[type=text],.fld input[type=number],.fld select{
   width:100%;padding:11px 12px;font-size:16px;font-family:var(--font-body);
   border:1px solid rgba(21,36,51,.22);border-radius:9px;background:#FFFDF8;color:var(--ink);
@@ -296,10 +313,10 @@ label.fld .cap small{font-weight:400;color:#7C8A97}
 .check-line{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:600;margin:2px 0 10px;cursor:pointer}
 .check-line input{width:19px;height:19px;accent-color:var(--brass-dim)}
 .fin-fields.disabled{opacity:.4;pointer-events:none}
-.form-hint{font-size:12px;color:#7C8A97;margin-top:4px;line-height:1.45}
+.form-hint{font-size:12px;color:#5E6D7A;margin-top:4px;line-height:1.45}
 .extra-row{display:grid;grid-template-columns:1fr 104px 104px 34px;gap:6px;margin-bottom:8px;align-items:center}
 .extra-row input,.extra-row select{
-  width:100%;padding:10px 10px;font-size:15px;font-family:var(--font-body);
+  width:100%;padding:10px 10px;font-size:16px;font-family:var(--font-body);
   border:1px solid rgba(21,36,51,.22);border-radius:9px;background:#FFFDF8;color:var(--ink);
 }
 .extra-row input:focus,.extra-row select:focus{outline:2px solid var(--brass);outline-offset:1px}
@@ -311,7 +328,14 @@ label.fld .cap small{font-weight:400;color:#7C8A97}
 /* datos dialog */
 .data-actions{display:flex;flex-direction:column;gap:10px;padding:4px 0 14px}
 .data-actions .btn{width:100%;text-align:center;padding:13px}
-.muted-note{font-size:12.5px;color:#7C8A97;line-height:1.5;margin-top:4px}
+.muted-note{font-size:12.5px;color:#5E6D7A;line-height:1.5;margin-top:4px}
+
+/* foco visible con teclado — anillo latón coherente en todo control interactivo */
+.btn:focus-visible,.icon-btn:focus-visible,.marina-chips .chip:focus-visible,
+nav.tabbar button:focus-visible,.dlg-close:focus-visible,.extra-row .x-del:focus-visible{
+  outline:2px solid var(--brass-bright);outline-offset:2px;border-radius:10px;
+}
+.dlg-close{min-width:40px;min-height:40px;display:inline-flex;align-items:center;justify-content:center}
 
 /* ---------- print (siempre imprime la vista Comparar, en horizontal) ---------- */
 @media print{
@@ -336,8 +360,13 @@ label.fld .cap small{font-weight:400;color:#7C8A97}
   table.ledger thead th{background:#eee!important;color:#111!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   table.ledger tr.total td,table.ledger tr.fraction td{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .chart{break-inside:avoid}
+  /* cada sección (tabla principal, proyección, matriz) inicia en página propia y no se parte */
+  .table-wrap,.chart{break-inside:avoid;page-break-inside:avoid}
+  #comparar-body .section-head{break-before:page;page-break-before:always;margin-top:0}
   .bar-track,.bar-fill{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .bar-fill{border:.5px solid #1B3A53}
+  /* filas cebra visibles en papel */
+  table.ledger tbody tr:nth-child(even) td{background:#f4f4f4!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 </style>
 </head>
@@ -455,13 +484,13 @@ label.fld .cap small{font-weight:400;color:#7C8A97}
             <input type="number" id="b-mant" min="0" step="any" inputmode="decimal" value="10">
           </label>
           <label class="fld"><span class="cap">Tripulación <small>(USD / mes)</small></span>
-            <input type="number" id="b-trip" min="0" step="any" inputmode="numeric" value="0">
+            <input type="number" id="b-trip" min="0" step="any" inputmode="numeric" placeholder="0">
           </label>
           <label class="fld"><span class="cap">Combustible y viajes <small>(USD / año)</small></span>
-            <input type="number" id="b-comb" min="0" step="any" inputmode="numeric" value="0">
+            <input type="number" id="b-comb" min="0" step="any" inputmode="numeric" placeholder="0">
           </label>
           <label class="fld full"><span class="cap">Otros gastos <small>(USD / año — recall, garantías, varios)</small></span>
-            <input type="number" id="b-otros" min="0" step="any" inputmode="numeric" value="0">
+            <input type="number" id="b-otros" min="0" step="any" inputmode="numeric" placeholder="0">
           </label>
         </div>
         <p class="form-hint">Mantenimiento incluye reparaciones complejas, recall y garantías. Ajusta el % según la edad del barco.</p>
@@ -492,28 +521,28 @@ label.fld .cap small{font-weight:400;color:#7C8A97}
         <p class="form-hint">Si eliges un banco de la pestaña Bancos, se usan su tasa, enganche y plazo; los campos manuales aplican solo con «Parámetros manuales».</p>
       </fieldset>
       <fieldset>
-        <legend>Proyección y propiedad fraccional</legend>
+        <legend>Uso, proyección y propiedad fraccional</legend>
         <div class="frm-grid">
           <label class="fld"><span class="cap">Depreciación 5 años <small>(%)</small></span>
             <input type="number" id="b-dep" min="0" max="100" step="any" inputmode="decimal" value="39.1">
           </label>
-          <label class="fld"><span class="cap">Número de fracciones</span>
-            <input type="number" id="b-frac" min="1" max="32" step="any" inputmode="numeric" value="8">
+          <label class="fld"><span class="cap">Número de fracciones <small>(1 = barco completo)</small></span>
+            <input type="number" id="b-frac" min="1" max="32" step="any" inputmode="numeric" placeholder="1">
           </label>
           <label class="fld"><span class="cap">Cuota de gestión <small>(% sobre operación / año)</small></span>
-            <input type="number" id="b-gestion" min="0" max="100" step="any" inputmode="decimal" value="0">
+            <input type="number" id="b-gestion" min="0" max="100" step="any" inputmode="decimal" placeholder="0">
           </label>
           <label class="fld"><span class="cap">Precio por fracción <small>(USD, opcional)</small></span>
-            <input type="number" id="b-pfrac" min="0" step="any" inputmode="numeric" value="0">
+            <input type="number" id="b-pfrac" min="0" step="any" inputmode="numeric" placeholder="0">
           </label>
           <label class="fld"><span class="cap">Días de uso por fracción <small>(al año, opcional)</small></span>
-            <input type="number" id="b-dias" min="0" max="365" step="any" inputmode="numeric" value="0">
+            <input type="number" id="b-dias" min="0" max="365" step="any" inputmode="numeric" placeholder="0">
           </label>
           <label class="fld"><span class="cap">Días de uso al año <small>(barco completo, opcional)</small></span>
-            <input type="number" id="b-diasuso" min="0" max="365" step="any" inputmode="numeric" value="0">
+            <input type="number" id="b-diasuso" min="0" max="365" step="any" inputmode="numeric" placeholder="0">
           </label>
           <label class="fld"><span class="cap">Charter equivalente <small>(USD/día, opcional)</small></span>
-            <input type="number" id="b-charter" min="0" step="any" inputmode="numeric" value="0">
+            <input type="number" id="b-charter" min="0" step="any" inputmode="numeric" placeholder="0">
           </label>
         </div>
         <p class="form-hint">La depreciación estándar del mercado náutico ronda 39% al año 5. La cuota de gestión (típica en fraccionales: ~10%) se aplica sobre la operación. Si el precio por fracción queda en 0 se calcula como precio ÷ fracciones; si los días de uso del barco quedan en 0 se usan fracciones × días por fracción. El charter equivalente permite comparar el costo por día contra rentar un barco similar.</p>
@@ -612,7 +641,7 @@ label.fld .cap small{font-weight:400;color:#7C8A97}
 <dialog id="dlg-datos">
   <div class="dlg-head"><h3>Tus datos</h3><button type="button" class="dlg-close" data-close="dlg-datos">✕</button></div>
   <div class="dlg-body">
-    <p class="muted-note" style="margin-bottom:12px">Todo se guarda automáticamente en este dispositivo. Usa <b>Exportar</b> para respaldar o pasar tus datos a otro teléfono / computadora.</p>
+    <p class="muted-note" style="margin-bottom:12px">Todo (barcos, marinas y bancos) se guarda automáticamente en este dispositivo. Usa <b>Exportar</b> para respaldar o pasar tus datos a otro teléfono / computadora. <b>Importar</b> reemplaza los datos actuales por los del archivo.</p>
     <div class="data-actions">
       <button class="btn btn-brass" id="btn-export">⇩ Exportar datos (archivo JSON)</button>
       <button class="btn btn-ghost" id="btn-import">⇧ Importar datos desde archivo</button>
@@ -724,19 +753,19 @@ function mejorMarinaPara(barco){
   }
   return mejor;
 }
-/** Mejor banco: menor tasa anual; en empate, menor pago anual. null si no hay bancos. */
+/** Mejor banco para este barco: el de menor PAGO ANUAL (coherente con la columna Total anual
+    que alimenta). Con precio 0 no hay pago que comparar → cae a la menor tasa. La Proyección a 5
+    años penaliza los plazos largos vía el saldo pendiente, así que este criterio no premia el
+    plazo más largo a ciegas. null si no hay bancos. */
 function mejorBancoPara(barco){
-  let mejor = null;
-  for (const bk of (state?.bancos || [])){
-    if (!mejor){ mejor = bk; continue; }
-    if (bk.tasaPct < mejor.tasaPct) mejor = bk;
-    else if (bk.tasaPct === mejor.tasaPct){
-      const a = pagoAnualFinanciamiento(barco.precio, bk.engPct, bk.tasaPct, bk.plazoAnios);
-      const b = pagoAnualFinanciamiento(barco.precio, mejor.engPct, mejor.tasaPct, mejor.plazoAnios);
-      if (a < b) mejor = bk;
-    }
+  const bancos = state?.bancos || [];
+  if (!bancos.length) return null;
+  if (num(barco.precio) <= 0){
+    return bancos.reduce((a,b) => b.tasaPct < a.tasaPct ? b : a);
   }
-  return mejor;
+  return bancos.reduce((a,b) =>
+    pagoAnualFinanciamiento(barco.precio, b.engPct, b.tasaPct, b.plazoAnios) <
+    pagoAnualFinanciamiento(barco.precio, a.engPct, a.tasaPct, a.plazoAnios) ? b : a);
 }
 /** Días de uso efectivos del barco completo (capturados, o fracciones × días por fracción). */
 function diasUsoDe(barco){
@@ -778,7 +807,7 @@ function clamp(v, lo, hi){ return Math.min(hi, Math.max(lo, v)); }
    Todo estado externo (localStorage o import) pasa por
    normalizarEstado(): campos coercionados, ids garantizados.
    ============================================================ */
-const STORE_KEY = "comparador-yates-v5";
+const STORE_KEY = "comparador-yates-v6";
 
 function normalizarEstado(d){
   if (!d || !Array.isArray(d.marinas) || !Array.isArray(d.barcos)) return null;
@@ -811,7 +840,7 @@ function normalizarEstado(d){
     seguroPct: num(b.seguroPct), mantPct: num(b.mantPct),
     tripMes: num(b.tripMes), combAnual: num(b.combAnual), otrosAnual: num(b.otrosAnual),
     finOn: !!b.finOn, finEngPct: num(b.finEngPct), finTasaPct: num(b.finTasaPct),
-    finPlazo: num(b.finPlazo) || 10,
+    finPlazo: num(b.finPlazo) || 5,
     bancoId: (typeof b.bancoId === "string" && bancos.some(x => x.id === b.bancoId)) ? b.bancoId : null,
     depPct5: b.depPct5 === undefined ? 39.1 : clamp(num(b.depPct5), 0, 100),
     fracciones: Math.max(1, Math.round(num(b.fracciones) || 1)),
@@ -876,9 +905,10 @@ function datosEjemplo(){
     criterio: "total",
   };
   function b(id,nombre,ft,extra){
+    // fracciones por defecto = 1 (barco completo). Los programas fraccionales fijan el número explícito.
     return { id, nombre, esloraFt:ft, precio:0, seguroPct:1.5, mantPct:10,
              tripMes:0, combAnual:0, otrosAnual:0,
-             finOn:false, finEngPct:20, finTasaPct:5.7, finPlazo:5, bancoId:null, depPct5:39.1, fracciones:8,
+             finOn:false, finEngPct:20, finTasaPct:5.7, finPlazo:5, bancoId:null, depPct5:39.1, fracciones:1,
              marinaId:null, gestionPct:0, precioFraccion:0, diasFraccion:0, diasUso:0, charterDia:0, extras:[], ...extra };
   }
 }
@@ -911,10 +941,12 @@ const esc  = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&l
 const mts  = ft => (num(ft)*0.3048).toFixed(1);
 function tarifaResumen(m){
   const u = m.unidad === "mes" ? "ft/mes" : "ft/día";
-  if (num(m.tarifaAlta)<=0 && num(m.tarifaBaja)<=0){
+  const alta = num(m.tarifaAlta), baja = num(m.tarifaBaja);
+  if (alta<=0 && baja<=0){
     return num(m.extrasMes) > 0 ? `solo servicios ${usd(num(m.extrasMes))}/mes` : null;
   }
-  return `${usd2(num(m.tarifaBaja))}–${usd2(num(m.tarifaAlta))} /${u}`;
+  // tarifa única (sin temporada) → un solo valor, no un rango repetido
+  return alta === baja ? `${usd2(alta)} /${u}` : `${usd2(baja)}–${usd2(alta)} /${u}`;
 }
 
 /* ============================================================
@@ -965,7 +997,7 @@ function renderBarcos(){
     const d = desglose(bo, null);
     return `<div class="card">
       <h3>${esc(bo.nombre)}</h3>
-      <div class="meta">${num(bo.esloraFt)} ft · ${mts(bo.esloraFt)} m · ${d.fracciones} ${d.fracciones===1?"fracción":"fracciones"}${(m=>m?` · ⚓ ${esc(m.nombre)}`:"")(state.marinas.find(m=>m.id===bo.marinaId))}${(bk=>bk&&bo.finOn?` · 🏦 ${esc(bk.nombre)}`:"")(bancoDe(bo))}</div>
+      <div class="meta">${num(bo.esloraFt)} ft · ${mts(bo.esloraFt)} m${d.fracciones>1?` · ${d.fracciones} fracciones`:""}${(m=>m?` · ⚓ ${esc(m.nombre)}`:"")(state.marinas.find(m=>m.id===bo.marinaId))}${(bk=>bk&&bo.finOn?` · 🏦 ${esc(bk.nombre)}`:"")(bancoDe(bo))}</div>
       <div class="figures">
         <div class="fig"><div class="lbl">Precio</div><div class="val">${num(bo.precio)>0 ? usd(num(bo.precio)) : "—"}</div></div>
         <div class="fig"><div class="lbl">Seguro</div><div class="val">${num(bo.seguroPct)}<small>%</small></div></div>
@@ -1005,17 +1037,21 @@ function metricaCriterio(x){
   if (c === "neto5pie") return eslora > 0 ? x.p.neto / eslora : null;
   return x.d.total;
 }
-/** Set de índices ganadores bajo el criterio activo (solo barcos con precio; requiere ≥2 comparables; incluye empates). */
+/** ¿El barco es comparable para «mejor»? Requiere precio y un costo de marina real:
+    un barco sin marina tarifada tiene total subestimado (marina = $0) y no debe ganar. */
+function comparable(x){ return num(x.bo.precio) > 0 && x.d.marinaAnual !== null; }
+/** Set de índices ganadores bajo el criterio activo (solo comparables; requiere ≥2; incluye empates). */
 function mejoresIdx(rows){
-  const vals = rows.map(x => num(x.bo.precio) > 0 ? metricaCriterio(x) : null);
+  const vals = rows.map(x => comparable(x) ? metricaCriterio(x) : null);
   const validos = vals.filter(v => v !== null);
   if (validos.length < 2) return new Set();
   const min = Math.min(...validos);
   return new Set(vals.map((v,i) => v !== null && v === min ? i : -1).filter(i => i >= 0));
 }
-/** Mínimo por fila: set de índices (con precio, ≥2 valores, empates incluidos). */
-function minRow(rows, get){
-  const vals = rows.map(x => num(x.bo.precio) > 0 ? get(x) : null);
+/** Mínimo por fila: set de índices (comparables, ≥2 valores, empates incluidos por valor mostrado). */
+function minRow(rows, get, redondear){
+  const raw = rows.map(x => comparable(x) ? get(x) : null);
+  const vals = raw.map(v => (v !== null && Number.isFinite(v) && redondear) ? redondear(v) : v);
   const validos = vals.filter(v => v !== null && Number.isFinite(v));
   if (validos.length < 2) return new Set();
   const min = Math.min(...validos);
@@ -1054,7 +1090,7 @@ function renderComparar(){
   if (!state.barcos.length || !state.marinas.length){
     chips.innerHTML = ""; critChips.innerHTML = "";
     sub.textContent = "";
-    body.innerHTML = `<div class="empty">Para comparar necesitas al menos <b>un barco</b> y <b>una marina con tarifa</b>.<br>Agrégalos en las pestañas de abajo.</div>`;
+    body.innerHTML = `<div class="empty">Para comparar necesitas al menos <b>un barco</b> y <b>una marina con tarifa</b>.<br>Agrégalos en las pestañas <b>Barcos</b> y <b>Marinas</b>.</div>`;
     return;
   }
   const modo = state.marinaSel;
@@ -1090,6 +1126,7 @@ function renderComparar(){
     }
   } else {
     const mostrarSel = modo === OPT || modo === ASIG;
+    html += avisoCriterio(rows);
     html += tablaComparativa(rows, mostrarSel);
     html += graficaTotales(rows, modo === OPT ? "combinación óptima" : modo === ASIG ? "marina asignada" : mSel.nombre);
     html += proyeccionTabla(rows);
@@ -1098,6 +1135,20 @@ function renderComparar(){
     html += matrizMarinas();
   }
   body.innerHTML = html;
+}
+
+/** Aviso cuando el criterio activo no puede clasificar por falta de datos (días de uso / charter). */
+function avisoCriterio(rows){
+  const c = state.criterio || "total";
+  if (c !== "dia" && c !== "charter") return "";
+  const comparables = rows.filter(comparable);
+  if (comparables.length < 2) return "";
+  const conMetrica = comparables.filter(x => metricaCriterio(x) !== null).length;
+  if (conMetrica >= 2) return "";
+  const falta = c === "dia"
+    ? "Captura los <b>días de uso al año</b> en al menos dos barcos (en el formulario del barco) para clasificar por costo por día."
+    : "Captura los <b>días de uso</b> y el <b>charter equivalente</b> en al menos dos barcos para clasificar contra el charter.";
+  return `<div class="empty" style="margin-bottom:16px;padding:18px 20px;text-align:left">${falta}</div>`;
 }
 
 function conceptosPersonalizados(barcos){
@@ -1118,11 +1169,12 @@ function tablaComparativa(rows, mostrarSel){
   const ds = rows.map(x => x.d);
   const badge = CRITERIOS.find(c => c.id === (state.criterio || "total"))?.badge ?? "◆";
   const ganadores = mejoresIdx(rows);
-  const bTotal = minRow(rows, x => x.d.total);
-  const bPie   = minRow(rows, x => num(x.bo.esloraFt) > 0 ? x.d.total/num(x.bo.esloraFt) : null);
-  const bDia   = minRow(rows, x => { const dd = diasUsoDe(x.bo); return dd > 0 ? x.d.total/dd : null; });
-  const bChar  = minRow(rows, x => { const dd = diasUsoDe(x.bo), ch = num(x.bo.charterDia); return (dd>0 && ch>0) ? (x.d.total/dd)/ch : null; });
-  const bFrac  = minRow(rows, x => x.d.porFraccionAnual);
+  const bTotal = minRow(rows, x => x.d.total, Math.round);
+  const bPie   = minRow(rows, x => num(x.bo.esloraFt) > 0 ? x.d.total/num(x.bo.esloraFt) : null, Math.round);
+  const bDia   = minRow(rows, x => { const dd = diasUsoDe(x.bo); return dd > 0 ? x.d.total/dd : null; }, Math.round);
+  const bChar  = minRow(rows, x => { const dd = diasUsoDe(x.bo), ch = num(x.bo.charterDia); return (dd>0 && ch>0) ? (x.d.total/dd)/ch : null; }, v => Math.round(v*100));
+  const bFrac  = minRow(rows, x => x.d.porFraccionAnual, Math.round);
+  const hayFrac = barcos.some(bo => num(bo.fracciones) > 1 || num(bo.precioFraccion) > 0);
 
   const fila = (lbl, note, get, bestSet) => `<tr>
     <td><span class="lbl">${lbl}</span>${note?`<span class="note">${note}</span>`:""}</td>
@@ -1166,8 +1218,8 @@ function tablaComparativa(rows, mostrarSel){
         const inv = num(bo.precioFraccion)>0 ? num(bo.precioFraccion) : (num(bo.precio)>0 ? num(bo.precio)/d.fracciones : null);
         return inv===null ? `<td class="na">—</td>` : `<td>${usd(inv)} <small>/${d.fracciones}</small></td>`;
       }).join("")}</tr>` : ""}
-      <tr class="fraction"><td><span class="lbl">Por fracción · año</span><span class="note">entre n.º de fracciones</span></td>${ds.map((d,i)=>`<td class="${bFrac.has(i)?'best':''}">${usd(d.porFraccionAnual)} <small>/${d.fracciones}</small></td>`).join("")}</tr>
-      <tr class="fraction"><td><span class="lbl">Por fracción · mes</span></td>${ds.map(d=>`<td>${usd(d.porFraccionAnual/12)}</td>`).join("")}</tr>
+      ${hayFrac ? `<tr class="fraction"><td><span class="lbl">Por fracción · año</span><span class="note">entre n.º de fracciones</span></td>${ds.map((d,i)=>`<td class="${bFrac.has(i)?'best':''}">${usd(d.porFraccionAnual)} <small>/${d.fracciones}</small></td>`).join("")}</tr>
+      <tr class="fraction"><td><span class="lbl">Por fracción · mes</span></td>${ds.map(d=>`<td>${usd(d.porFraccionAnual/12)}</td>`).join("")}</tr>` : ""}
       ${barcos.some(bo=>num(bo.diasFraccion)>0) ? `<tr class="fraction"><td><span class="lbl">Por día de uso · fracción</span><span class="note">cuota anual ÷ días de uso de la fracción</span></td>${ds.map((d,i)=>{
         const dias = num(barcos[i].diasFraccion);
         return dias>0 ? `<td>${usd(d.porFraccionAnual/dias)} <small>/día</small></td>` : `<td class="na">—</td>`;
@@ -1196,8 +1248,8 @@ function graficaTotales(rows, titulo){
 
 function proyeccionTabla(rows){
   const badgeNeto = (state.criterio === "pie" || state.criterio === "neto5pie");
-  const bNeto = minRow(rows, x => x.p.neto);
-  const bNetoPie = minRow(rows, x => num(x.bo.esloraFt) > 0 ? x.p.neto/num(x.bo.esloraFt) : null);
+  const bNeto = minRow(rows, x => x.p.neto, Math.round);
+  const bNetoPie = minRow(rows, x => num(x.bo.esloraFt) > 0 ? x.p.neto/num(x.bo.esloraFt) : null, Math.round);
   const ganadores = badgeNeto ? bNetoPie : bNeto;
   const badge = badgeNeto ? "◆ MENOR NETO POR PIE" : "◆ MENOR COSTO NETO";
   const conSaldo = rows.some(x => x.p.saldo > 0);
@@ -1219,8 +1271,8 @@ function proyeccionTabla(rows){
         ${rows.map((x,i)=>`<td class="${bNeto.has(i)?'best':''}">${usd(x.p.neto)}</td>`).join("")}</tr>
       <tr><td><span class="lbl">Neto 5 años por pie</span><span class="note">neto ÷ eslora — compara tamaños</span></td>
         ${rows.map((x,i)=> num(x.bo.esloraFt)>0 ? `<td class="${bNetoPie.has(i)?'best':''}">${usd(x.p.neto/num(x.bo.esloraFt))}</td>` : `<td class="na">—</td>`).join("")}</tr>
-      <tr class="fraction"><td><span class="lbl">Por fracción · 5 años</span><span class="note">entre n.º de fracciones</span></td>
-        ${rows.map(x=>`<td>${usd(x.p.porFraccion)} <small>/${x.d.fracciones}</small></td>`).join("")}</tr>
+      ${rows.some(x=>num(x.bo.fracciones)>1 || num(x.bo.precioFraccion)>0) ? `<tr class="fraction"><td><span class="lbl">Por fracción · 5 años</span><span class="note">entre n.º de fracciones</span></td>
+        ${rows.map(x=>`<td>${usd(x.p.porFraccion)} <small>/${x.d.fracciones}</small></td>`).join("")}</tr>` : ""}
     </tbody>
   </table>
   </div>
@@ -1259,7 +1311,7 @@ function matrizMarinas(){
     <thead><tr><th>Barco</th>${marinas.map(m=>`<th>${esc(m.nombre)}<span class="sub">${tarifaResumen(m)}</span></th>`).join("")}</tr></thead>
     <tbody>
       ${barcos.map(bo=>{
-        const costos = marinas.map(m => costoMarinaAnual(m, bo.esloraFt));
+        const costos = marinas.map(m => Math.round(costoMarinaAnual(m, bo.esloraFt)));
         const minC = Math.min(...costos);
         return `<tr><td><span class="lbl">${esc(bo.nombre)}</span><span class="note">${num(bo.esloraFt)} ft</span></td>
           ${costos.map(c=>`<td class="${c===minC && marinas.length>1 ? "best":""}">${usd(c)}</td>`).join("")}</tr>`;
@@ -1312,6 +1364,7 @@ function borrarBanco(id){
 
 /* --- barcos --- */
 let editandoBarco = null;
+let manualFin = { eng: 20, tasa: 5.7, plazo: 5 }; // memoria de parámetros manuales del barco en edición
 function abrirBarco(id){
   editandoBarco = id || null;
   const bo = id ? state.barcos.find(x=>x.id===id) : null;
@@ -1319,22 +1372,24 @@ function abrirBarco(id){
   $("b-nombre").value = bo?.nombre ?? "";
   $("b-eslora").value = bo?.esloraFt ?? "";
   $("b-precio").value = bo && num(bo.precio)>0 ? bo.precio : "";
+  const opt = v => (num(v) > 0 ? v : ""); // campos opcionales: vacío en vez de 0 literal (mejor en iPhone)
   $("b-seguro").value = bo?.seguroPct ?? 1.5;
   $("b-mant").value   = bo?.mantPct ?? 10;
-  $("b-trip").value   = bo?.tripMes ?? 0;
-  $("b-comb").value   = bo?.combAnual ?? 0;
-  $("b-otros").value  = bo?.otrosAnual ?? 0;
+  $("b-trip").value   = opt(bo?.tripMes);
+  $("b-comb").value   = opt(bo?.combAnual);
+  $("b-otros").value  = opt(bo?.otrosAnual);
   $("b-fin-on").checked = !!bo?.finOn;
   $("b-fin-eng").value  = bo?.finEngPct ?? 20;
   $("b-fin-tasa").value = bo?.finTasaPct ?? 5.7;
   $("b-fin-plazo").value= bo?.finPlazo ?? 5;
+  manualFin = { eng: bo?.finEngPct ?? 20, tasa: bo?.finTasaPct ?? 5.7, plazo: bo?.finPlazo ?? 5 };
   $("b-dep").value      = bo?.depPct5 ?? 39.1;
-  $("b-frac").value     = bo?.fracciones ?? 8;
-  $("b-gestion").value  = bo?.gestionPct ?? 0;
-  $("b-pfrac").value    = bo && num(bo.precioFraccion)>0 ? bo.precioFraccion : 0;
-  $("b-dias").value     = bo?.diasFraccion ?? 0;
-  $("b-diasuso").value  = bo?.diasUso ?? 0;
-  $("b-charter").value  = bo && num(bo.charterDia)>0 ? bo.charterDia : 0;
+  $("b-frac").value     = bo?.fracciones ?? 1;
+  $("b-gestion").value  = opt(bo?.gestionPct);
+  $("b-pfrac").value    = opt(bo?.precioFraccion);
+  $("b-dias").value     = opt(bo?.diasFraccion);
+  $("b-diasuso").value  = opt(bo?.diasUso);
+  $("b-charter").value  = opt(bo?.charterDia);
   $("b-marina").innerHTML = `<option value="">— Sin asignar —</option>` +
     state.marinas.map(m => `<option value="${esc(m.id)}">${esc(m.nombre)}</option>`).join("");
   $("b-marina").value = bo?.marinaId ?? "";
@@ -1381,9 +1436,11 @@ function guardarBarco(){
     combAnual: num($("b-comb").value),
     otrosAnual: num($("b-otros").value),
     finOn: $("b-fin-on").checked,
-    finEngPct: num($("b-fin-eng").value),
-    finTasaPct: num($("b-fin-tasa").value),
-    finPlazo: num($("b-fin-plazo").value),
+    // si hay banco elegido, los campos manuales muestran (deshabilitados) los del banco;
+    // conservamos los valores manuales del usuario, no los del banco.
+    finEngPct: $("b-banco").value ? manualFin.eng : num($("b-fin-eng").value),
+    finTasaPct: $("b-banco").value ? manualFin.tasa : num($("b-fin-tasa").value),
+    finPlazo: $("b-banco").value ? manualFin.plazo : num($("b-fin-plazo").value),
     depPct5: clamp(num($("b-dep").value), 0, 100),
     fracciones: Math.max(1, Math.round(num($("b-frac").value) || 1)),
     marinaId: $("b-marina").value || null,
@@ -1465,6 +1522,8 @@ function importar(file){
     try{
       const d = normalizarEstado(JSON.parse(rd.result));
       if (!d) throw new Error("formato");
+      // confirmar ANTES de reemplazar: importar sustituye todos los datos actuales
+      if (!confirm(`Esto reemplaza tus datos actuales (${state.barcos.length} barcos, ${state.marinas.length} marinas, ${state.bancos.length} bancos) con los del archivo (${d.barcos.length} barcos, ${d.marinas.length} marinas, ${d.bancos.length} bancos). ¿Continuar?`)) return;
       state = d; render();
       $("dlg-datos").close();
       alert("Datos importados correctamente.");
@@ -1514,10 +1573,15 @@ $("btn-add-extra").addEventListener("click", () => agregarExtraRow(null));
 $("b-fin-on").addEventListener("change", actualizarFinFields);
 function actualizarFinFields(){ $("fin-fields").classList.toggle("disabled", !$("b-fin-on").checked); }
 $("b-banco").addEventListener("change", actualizarBancoFields);
+// recuerda los parámetros manuales del usuario cuando edita a mano (para no perderlos al ver un banco)
+["b-fin-eng","b-fin-tasa","b-fin-plazo"].forEach(fid => $(fid).addEventListener("input", () => {
+  if (!$("b-banco").value){ manualFin = { eng: num($("b-fin-eng").value), tasa: num($("b-fin-tasa").value), plazo: num($("b-fin-plazo").value) }; }
+}));
 function actualizarBancoFields(){
   const bk = state.bancos.find(x => x.id === $("b-banco").value) || null;
   ["b-fin-eng","b-fin-tasa","b-fin-plazo"].forEach(fid => { $(fid).disabled = !!bk; });
   if (bk){ $("b-fin-eng").value = bk.engPct; $("b-fin-tasa").value = bk.tasaPct; $("b-fin-plazo").value = bk.plazoAnios; }
+  else { $("b-fin-eng").value = manualFin.eng; $("b-fin-tasa").value = manualFin.tasa; $("b-fin-plazo").value = manualFin.plazo; }
 }
 
 $("m-unidad").addEventListener("change", actualizarUnidadMarina);
