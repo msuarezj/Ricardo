@@ -1336,17 +1336,38 @@ function tablaComparativa(rows, mostrarSel){
 
 function graficaTotales(rows, titulo){
   if (rows.length < 2) return "";
+  const cId = state.criterio || "total";
+  const cObj = CRITERIOS.find(c=>c.id===cId) || CRITERIOS[0];
   const ganadores = mejoresIdx(rows);
-  const max = Math.max(...rows.map(x => x.d.total), 1);
-  return `<div class="chart"><h3>Total anual por barco — ${esc(titulo)}</h3>
-    ${rows.map((x,i) => {
-      const sinPrecio = num(x.bo.precio) <= 0;
+  
+  const values = rows.map(x => {
+    let val = metricaCriterio(x);
+    if (val === null) return { row: x, val: 0, text: "Faltan datos" };
+    return {
+      row: x,
+      val: val,
+      text: cId === "charter" ? `${Math.round(val*100)}%` : usd(val)
+    };
+  });
+  
+  const max = Math.max(...values.map(v => v.val), 1);
+  
+  let chartTitle = "Total anual";
+  if (cId === "pie") chartTitle = "Costo por pie";
+  if (cId === "dia") chartTitle = "Costo por día de uso";
+  if (cId === "charter") chartTitle = "Costo vs tarifa charter";
+  if (cId === "neto5pie") chartTitle = "Costo neto a 5 años por pie";
+
+  return `<div class="chart"><h3>${chartTitle} — ${esc(titulo)}</h3>
+    ${values.map((item, i) => {
+      const sinPrecio = num(item.row.bo.precio) <= 0;
+      const pct = max > 0 ? (item.val / max * 100) : 0;
       return `<div class="bar-row ${!sinPrecio && ganadores.has(i) ? "best":""} ${sinPrecio ? "pending":""}">
-      <span class="name">${esc(x.bo.nombre)}${sinPrecio ? `<small class="pend">precio pendiente</small>` : ""}</span>
-      <div class="bar-track"><div class="bar-fill" style="width:${Math.max(2,(x.d.total/max*100)).toFixed(1)}%"></div></div>
-      <span class="amt">${usd(x.d.total)}</span>
+      <span class="name">${esc(item.row.bo.nombre)}${sinPrecio ? `<small class="pend">precio pendiente</small>` : ""}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.max(2, pct).toFixed(1)}%"></div></div>
+      <span class="amt">${item.text}</span>
     </div>`;}).join("")}
-    <p class="hint" style="margin-bottom:0">Las barras muestran el total anual; el verde marca al ganador del criterio «${esc(CRITERIOS.find(c=>c.id===(state.criterio||"total"))?.label ?? "")}» — puede no ser la barra más corta.</p>
+    <p class="hint" style="margin-bottom:0">Las barras muestran el ${chartTitle.toLowerCase()}; el color verde marca la mejor opción.</p>
   </div>`;
 }
 
