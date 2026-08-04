@@ -400,7 +400,7 @@ nav.tabbar button:focus-visible,.dlg-close:focus-visible,.extra-row .x-del:focus
 <header class="app">
   <div class="brand">
     <h1>Comparador <em>de Yates</em></h1>
-    <div class="tagline">Costo real de propiedad · marina por marina</div>
+    <div class="tagline">Costo real de propiedad</div>
   </div>
   <div class="header-actions">
     <button class="icon-btn" id="btn-currency" title="Cambiar moneda">USD</button>
@@ -661,6 +661,35 @@ nav.tabbar button:focus-visible,.dlg-close:focus-visible,.extra-row .x-del:focus
       <button type="submit" class="btn btn-brass">Guardar banco</button>
     </div>
   </form>
+</dialog>
+
+<!-- ============ DIALOGO: GUÍA ============ -->
+<dialog id="dlg-guide">
+  <div class="dlg-head">
+    <h3>Bienvenido al Comparador de Yates 👋</h3>
+    <button type="button" class="close" data-close="dlg-guide">×</button>
+  </div>
+  <div class="dlg-body" style="line-height:1.6;font-size:14px;color:var(--text)">
+    <p>Esta herramienta te ayudará a descubrir el <strong>costo real de comprar y mantener un yate</strong> de forma rápida y sencilla.</p>
+    <div style="display:flex;flex-direction:column;gap:16px;margin:20px 0;">
+      <div style="padding:16px;background:var(--bg-mid);border-radius:12px;border:1px solid var(--border);">
+        <h4 style="margin:0 0 8px 0;display:flex;align-items:center;gap:8px;"><span class="icon" style="font-size:20px">🚤</span> 1. Agrega tus yates</h4>
+        <p style="margin:0;font-size:13px;color:var(--text-muted)">Ve a la pestaña <strong>Barcos</strong> y añade las opciones que estás considerando. Si no conoces algún costo, usa el botón <strong>Auto-Estimar</strong> y nuestra IA calculará un promedio de mercado por ti.</p>
+      </div>
+      <div style="padding:16px;background:var(--bg-mid);border-radius:12px;border:1px solid var(--border);">
+        <h4 style="margin:0 0 8px 0;display:flex;align-items:center;gap:8px;"><span class="icon" style="font-size:20px">⚓️</span> 2. Elige las Marinas</h4>
+        <p style="margin:0;font-size:13px;color:var(--text-muted)">En la pestaña <strong>Marinas</strong>, puedes agregar los puertos donde te gustaría atracar. El comparador cruzará automáticamente los costos según el tamaño de cada barco.</p>
+      </div>
+      <div style="padding:16px;background:var(--bg-mid);border-radius:12px;border:1px solid var(--border);">
+        <h4 style="margin:0 0 8px 0;display:flex;align-items:center;gap:8px;"><span class="icon" style="font-size:20px">📊</span> 3. Compara y Decide</h4>
+        <p style="margin:0;font-size:13px;color:var(--text-muted)">Ve a la pestaña <strong>Comparar</strong> para ver gráficas claras con el resumen financiero. Usa los botones superiores para ver cuál yate es el más rentable por <strong>costo por pie</strong>, <strong>costo por día</strong> o frente a rentar (<strong>Charter</strong>).</p>
+      </div>
+    </div>
+    <p style="text-align:center;font-size:13px;"><em>¡No te preocupes por equivocarte! Tus datos se guardan en tu dispositivo de forma privada.</em></p>
+  </div>
+  <div class="dlg-foot" style="justify-content:center">
+    <button type="button" class="btn btn-brass" data-close="dlg-guide" style="width:100%;padding:14px;font-size:16px">¡Comenzar!</button>
+  </div>
 </dialog>
 
 <!-- ============ DIALOGO: DATOS ============ -->
@@ -1800,6 +1829,10 @@ $("btn-reset").addEventListener("click", () => {
 /* arranque */
 cargar();
 render();
+if (!localStorage.getItem("v6-guide-seen")) {
+  $("dlg-guide").showModal();
+  localStorage.setItem("v6-guide-seen", "true");
+}
 </script>
 </body>
 </html>
