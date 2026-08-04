@@ -567,7 +567,7 @@ nav.tabbar button:focus-visible,.dlg-close:focus-visible,.extra-row .x-del:focus
           <label class="fld"><span class="cap">Días de uso al año <small>(barco completo, opcional)</small></span>
             <input type="number" id="b-diasuso" min="0" max="365" step="any" inputmode="numeric" placeholder="0">
           </label>
-          <label class="fld"><span class="cap">Charter equivalente <small>(USD/día, opcional)</small></span>
+          <label class="fld"><span class="cap">Charter equivalente <small>(USD/día, opcional)</small> <button type="button" class="btn btn-ghost" id="btn-auto-charter" style="padding:2px 8px;font-size:10px;margin-left:8px;border-radius:4px;height:auto">Auto-Estimar</button></span>
             <input type="number" id="b-charter" min="0" step="any" inputmode="numeric" placeholder="0">
           </label>
         </div>
@@ -1687,6 +1687,36 @@ document.addEventListener("click", e => {
 });
 document.querySelectorAll("[data-close]").forEach(b => b.addEventListener("click", () => $(b.dataset.close).close()));
 
+$("btn-auto-charter").addEventListener("click", async () => {
+  const ft = num($("b-eslora").value);
+  if (ft < 20) { alert("Ingresa primero la eslora del barco (pies)."); return; }
+  const lengthM = ft * 0.3048;
+  const btn = $("btn-auto-charter");
+  const oldText = btn.textContent;
+  btn.textContent = "Calculando...";
+  btn.disabled = true;
+  try {
+    const res = await fetch("https://bluewaveos.com/api/public/owners/estimate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ length_m: lengthM, vessel_type: "motor" })
+    });
+    if (!res.ok) throw new Error("Error en red");
+    const data = await res.json();
+    if (data.weekly_rate && data.weekly_rate.mid) {
+      const daily = Math.round(data.weekly_rate.mid / 7);
+      $("b-charter").value = daily;
+      alert(`Estimación de Bluewave OS: ${usd(daily)} USD / día\n(Basado en ${data.segment_sample_size} yates comparables)`);
+    } else {
+      alert("No se pudo estimar la tarifa para esta eslora (faltan comparables en Bluewave OS).");
+    }
+  } catch (e) {
+    alert("Error conectando con Bluewave OS.");
+  } finally {
+    btn.textContent = oldText;
+    btn.disabled = false;
+  }
+});
 $("btn-autoestimar").addEventListener("click", () => {
   const ft = num($("b-eslora").value);
   if (ft < 20) { alert("Ingresa primero la eslora del barco (pies, mínimo 20)."); return; }
