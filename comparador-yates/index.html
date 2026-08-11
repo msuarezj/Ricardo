@@ -491,7 +491,7 @@ nav.tabbar button:focus-visible,.dlg-close:focus-visible,.extra-row .x-del:focus
           <label class="fld"><span class="cap">Eslora <small>(pies)</small></span>
             <input type="number" id="b-eslora" required min="1" step="any" inputmode="decimal" placeholder="90">
           </label>
-          <label class="fld"><span class="cap">Precio <small>(USD)</small></span>
+          <label class="fld"><span class="cap">Precio Total <small>(USD, incluso si es fraccional)</small></span>
             <input type="number" id="b-precio" min="0" step="any" inputmode="numeric" placeholder="0">
           </label>
           <label class="fld full"><span class="cap">Marina asignada <small>(puerto base — usa su tarifa como costo real)</small></span>
@@ -500,8 +500,11 @@ nav.tabbar button:focus-visible,.dlg-close:focus-visible,.extra-row .x-del:focus
         </div>
         <p class="form-hint" id="b-eslora-hint"></p>
       </fieldset>
+      <details class="accordion" style="margin-top:20px; box-shadow:none; border:1px solid var(--paper-line);">
+        <summary style="font-size:14.5px; padding:12px 16px; background:#FBF8F0;">⚙️ Opciones Avanzadas (Autocompletadas)</summary>
+        <div class="acc-body">
       <fieldset>
-        <legend>Costos anuales de operación <button type="button" class="btn btn-ghost" id="btn-autoestimar" style="padding:2px 8px;font-size:10px;margin-left:8px;border-radius:4px;height:auto">Auto-Estimar</button></legend>
+        <legend>Costos anuales de operación <button type="button" class="btn btn-ghost" id="btn-autoestimar" style="padding:2px 8px;font-size:10px;margin-left:8px;border-radius:4px;height:auto">Auto-Estimar manual</button></legend>
         <div class="frm-grid">
           <label class="fld"><span class="cap">Seguro <small>(% del valor / año)</small></span>
             <input type="number" id="b-seguro" min="0" step="any" inputmode="decimal" value="1.5">
@@ -573,6 +576,8 @@ nav.tabbar button:focus-visible,.dlg-close:focus-visible,.extra-row .x-del:focus
         </div>
         <p class="form-hint">La depreciación estándar del mercado náutico ronda 39% al año 5. La cuota de gestión (típica en fraccionales: ~10%) se aplica sobre la operación. Si el precio por fracción queda en 0 se calcula como precio ÷ fracciones; si los días de uso del barco quedan en 0 se usan fracciones × días por fracción. El charter equivalente permite comparar el costo por día contra rentar un barco similar.</p>
       </fieldset>
+        </div>
+      </details>
     </div>
     <div class="dlg-foot">
       <button type="button" class="btn btn-ghost" data-close="dlg-barco">Cancelar</button>
@@ -672,23 +677,24 @@ nav.tabbar button:focus-visible,.dlg-close:focus-visible,.extra-row .x-del:focus
   <div class="dlg-body" style="line-height:1.6;font-size:14px;color:var(--text)">
     <p>Esta herramienta te ayudará a descubrir el <strong>costo real de comprar y mantener un yate</strong> de forma rápida y sencilla.</p>
     <div style="display:flex;flex-direction:column;gap:16px;margin:20px 0;">
-      <div style="padding:16px;background:var(--bg-mid);border-radius:12px;border:1px solid var(--border);">
+      <div style="padding:16px;background:var(--paper-dim);border-radius:12px;border:1px solid var(--paper-line);">
         <h4 style="margin:0 0 8px 0;display:flex;align-items:center;gap:8px;"><span class="icon" style="font-size:20px">🚤</span> 1. Agrega tus yates</h4>
-        <p style="margin:0;font-size:13px;color:var(--text-muted)">Ve a la pestaña <strong>Barcos</strong> y añade las opciones que estás considerando. Si no conoces algún costo, usa el botón <strong>Auto-Estimar</strong> y nuestra IA calculará un promedio de mercado por ti.</p>
+        <p style="margin:0;font-size:13px;color:#5E6D7A">Ve a la pestaña <strong>Barcos</strong> y añade las opciones que estás considerando. Al ingresar la eslora, nuestra IA calculará automáticamente los costos de tripulación, combustible y más.</p>
       </div>
-      <div style="padding:16px;background:var(--bg-mid);border-radius:12px;border:1px solid var(--border);">
+      <div style="padding:16px;background:var(--paper-dim);border-radius:12px;border:1px solid var(--paper-line);">
         <h4 style="margin:0 0 8px 0;display:flex;align-items:center;gap:8px;"><span class="icon" style="font-size:20px">⚓️</span> 2. Elige las Marinas</h4>
-        <p style="margin:0;font-size:13px;color:var(--text-muted)">En la pestaña <strong>Marinas</strong>, puedes agregar los puertos donde te gustaría atracar. El comparador cruzará automáticamente los costos según el tamaño de cada barco.</p>
+        <p style="margin:0;font-size:13px;color:#5E6D7A">En la pestaña <strong>Marinas</strong>, puedes agregar los puertos donde te gustaría atracar. El comparador cruzará automáticamente los costos según el tamaño de cada barco.</p>
       </div>
-      <div style="padding:16px;background:var(--bg-mid);border-radius:12px;border:1px solid var(--border);">
+      <div style="padding:16px;background:var(--paper-dim);border-radius:12px;border:1px solid var(--paper-line);">
         <h4 style="margin:0 0 8px 0;display:flex;align-items:center;gap:8px;"><span class="icon" style="font-size:20px">📊</span> 3. Compara y Decide</h4>
-        <p style="margin:0;font-size:13px;color:var(--text-muted)">Ve a la pestaña <strong>Comparar</strong> para ver gráficas claras con el resumen financiero. Usa los botones superiores para ver cuál yate es el más rentable por <strong>costo por pie</strong>, <strong>costo por día</strong> o frente a rentar (<strong>Charter</strong>).</p>
+        <p style="margin:0;font-size:13px;color:#5E6D7A">Ve a la pestaña <strong>Comparar</strong> para ver gráficas claras con el resumen financiero. Usa los botones superiores para ver cuál yate es el más rentable por <strong>costo por pie</strong>, <strong>costo por día</strong> o frente a rentar (<strong>Charter</strong>).</p>
       </div>
     </div>
     <p style="text-align:center;font-size:13px;"><em>¡No te preocupes por equivocarte! Tus datos se guardan en tu dispositivo de forma privada.</em></p>
   </div>
-  <div class="dlg-foot" style="justify-content:center">
-    <button type="button" class="btn btn-brass" data-close="dlg-guide" style="width:100%;padding:14px;font-size:16px">¡Comenzar!</button>
+  <div class="dlg-foot" style="justify-content:center; flex-direction:column; gap:10px;">
+    <button type="button" class="btn btn-brass" id="btn-guide-scratch" style="width:100%;padding:14px;font-size:16px">¡Empezar con mi propio yate!</button>
+    <button type="button" class="btn btn-ghost" id="btn-guide-demo" style="width:100%;padding:14px;font-size:14px">Explorar datos de ejemplo</button>
   </div>
 </dialog>
 
@@ -997,6 +1003,7 @@ async function fetchExchangeRate() {
     const data = await response.json();
     if (data && data.rates && data.rates.USD) {
       TASA_EUR = data.rates.USD;
+      if (currentCurrency === "EUR") render();
     }
   } catch(e) {
     console.error("No se pudo cargar el tipo de cambio, usando default:", e);
@@ -1582,13 +1589,13 @@ function leerExtras(){
 function guardarBarco(){
   const datos = {
     nombre: $("b-nombre").value.trim() || "Barco sin nombre",
-    esloraFt: num($("b-eslora").value),
-    precio: num($("b-precio").value),
-    seguroPct: num($("b-seguro").value),
-    mantPct: num($("b-mant").value),
-    tripMes: num($("b-trip").value),
-    combAnual: num($("b-comb").value),
-    otrosAnual: num($("b-otros").value),
+    esloraFt: Math.max(0, num($("b-eslora").value)),
+    precio: Math.max(0, num($("b-precio").value)),
+    seguroPct: Math.max(0, num($("b-seguro").value)),
+    mantPct: Math.max(0, num($("b-mant").value)),
+    tripMes: Math.max(0, num($("b-trip").value)),
+    combAnual: Math.max(0, num($("b-comb").value)),
+    otrosAnual: Math.max(0, num($("b-otros").value)),
     finOn: $("b-fin-on").checked,
     // si hay banco elegido, los campos manuales muestran (deshabilitados) los del banco;
     // conservamos los valores manuales del usuario, no los del banco.
@@ -1600,10 +1607,10 @@ function guardarBarco(){
     marinaId: $("b-marina").value || null,
     bancoId: $("b-banco").value || null,
     gestionPct: clamp(num($("b-gestion").value), 0, 100),
-    precioFraccion: num($("b-pfrac").value),
+    precioFraccion: Math.max(0, num($("b-pfrac").value)),
     diasFraccion: clamp(num($("b-dias").value), 0, 365),
     diasUso: clamp(num($("b-diasuso").value), 0, 365),
-    charterDia: num($("b-charter").value),
+    charterDia: Math.max(0, num($("b-charter").value)),
     extras: leerExtras(),
   };
   const existente = editandoBarco ? state.barcos.find(x=>x.id===editandoBarco) : null;
@@ -1639,10 +1646,10 @@ function guardarMarina(){
     nombre: $("m-nombre").value.trim() || "Marina sin nombre",
     ubic: $("m-ubic").value.trim(),
     unidad: $("m-unidad").value === "mes" ? "mes" : "dia",
-    tarifaAlta: num($("m-alta").value),
-    tarifaBaja: num($("m-baja").value),
+    tarifaAlta: Math.max(0, num($("m-alta").value)),
+    tarifaBaja: Math.max(0, num($("m-baja").value)),
     mesesAlta: clamp(num($("m-meses").value), 0, 12),
-    extrasMes: num($("m-extras").value),
+    extrasMes: Math.max(0, num($("m-extras").value)),
   };
   const existente = editandoMarina ? state.marinas.find(x=>x.id===editandoMarina) : null;
   if (existente){ Object.assign(existente, datos); }
@@ -1809,6 +1816,21 @@ $("b-eslora").addEventListener("input", actualizarEsloraHint);
 function actualizarEsloraHint(){
   const ft = num($("b-eslora").value);
   $("b-eslora-hint").textContent = ft > 0 ? `${ft} pies ≈ ${mts(ft)} metros de eslora.` : "";
+  if (ft >= 20) {
+    const hrs = 150;
+    let eurHr = 0;
+    if (ft < 100) eurHr = 260;
+    else if (ft < 130) eurHr = 487;
+    else if (ft < 165) eurHr = 870;
+    else if (ft < 195) eurHr = 1455;
+    else if (ft < 260) eurHr = 2280;
+    else eurHr = 3825;
+    
+    if (!$("b-comb").value) $("b-comb").value = Math.round(eurHr * TASA_EUR * hrs);
+    if (ft >= 60 && !$("b-trip").value) $("b-trip").value = Math.round(ft * 120);
+    if (!$("b-seguro").value) $("b-seguro").value = 1.5;
+    if (!$("b-mant").value) $("b-mant").value = 10;
+  }
 }
 
 $("btn-currency").addEventListener("click", () => {
@@ -1827,7 +1849,37 @@ $("btn-reset").addEventListener("click", () => {
 });
 
 /* arranque */
+function goToTab(tabId) {
+  document.querySelectorAll("nav.tabbar button").forEach(b => b.classList.toggle("active", b.dataset.view === tabId));
+  document.querySelectorAll("section.view").forEach(v => v.classList.toggle("active", v.id === "view-" + tabId));
+}
+
+$("btn-guide-scratch").addEventListener("click", () => {
+  // Clear boats, but keep a default marina and a default bank to make math work instantly
+  const demo = datosEjemplo();
+  state.barcos = []; 
+  state.marinas = [demo.marinas[0]]; // Keep "Marina Promedio"
+  state.bancos = [demo.bancos[0]]; // Keep "Memorándum BKI" (Standard Financing)
+  state.marinaSel = demo.marinas[0].id;
+  
+  guardar(); render();
+  $("dlg-guide").close();
+  goToTab("barcos");
+  setTimeout(() => {
+    $("btn-add-barco").click();
+    // Auto-select the default marina and bank in the new boat form
+    $("b-marina").value = demo.marinas[0].id;
+    $("b-banco").value = demo.bancos[0].id;
+    $("b-fin-on").checked = true;
+    actualizarFinFields();
+  }, 150);
+});
+$("btn-guide-demo").addEventListener("click", () => {
+  $("dlg-guide").close();
+});
+
 cargar();
+if (state.barcos.length === 0) goToTab("barcos");
 render();
 if (!localStorage.getItem("v6-guide-seen")) {
   $("dlg-guide").showModal();
