@@ -868,7 +868,7 @@ function clamp(v, lo, hi){ return Math.min(hi, Math.max(lo, v)); }
    Todo estado externo (localStorage o import) pasa por
    normalizarEstado(): campos coercionados, ids garantizados.
    ============================================================ */
-const STORE_KEY = "comparador-yates-v9";
+const STORE_KEY = "comparador-yates-v10";
 
 function normalizarEstado(d){
   if (!d || !Array.isArray(d.marinas) || !Array.isArray(d.barcos)) return null;
@@ -978,7 +978,11 @@ function datosEjemplo(){
         // que los tres tarifarios están en USD. Resuelto — no aplicar conversión.
         // Alternativas del mismo tarifario: upgrade IPS1350 (735 kW c/u) +$683,200 · layout 1.2 (4 guest) $10,285,905.
         // Entrega en EAU, ex-works: sin flete, arancel ni matriculación. Manga 9.10 m plegada / 12.00 m desplegada.
-        seguroPct:1.72, mantPct:1.79, tripMes:27600, combAnual:21900, otrosAnual:56100, depPct5:39.8,
+        seguroPct:1.72, mantPct:1.79, tripMes:27600, combAnual:21900, otrosAnual:56100, depPct5:36,
+        // depPct5 36 (banda 30-43): NO hay ni una reventa del 88 Ultima en el mundo. Sale del 80 Power, que sí
+        // tiene mercado (11 listados en 3 años), medido contra COSTE DE REPOSICIÓN: -27%, +4 por primero de
+        // serie, +2 por entrega en EAU (los peores precios del 80 Power están en Asia, -30/-40% vs Europa),
+        // +3 porque Gdansk recortó 1.6 M€ sobre stock nuevo y los cascos 2019-24 pasaron a ser «Gen 1».
         diasUso:120, charterDia:12300, // charter: banda del SL86A ($86k/sem); no hay listado real del 88 Ultima
         }),
       b("b-bgm75","Bluegame BGM75",74.7,{ precio:9917440, marinaId:"m-ftl",
@@ -989,7 +993,12 @@ function datosEjemplo(){
         // estricta del monto, remitiendo cualquier cita externa al precio de lista. Por eso la tabla usa la lista.
         // Sustituye el 10,850,000 que traía la semilla (precio público s/Ricardo, chat 1/jul), sin documento.
         // Multicasco «estrecho»: manga 8.15 m — el recargo de marina puede ser menor que en los otros dos.
-        seguroPct:1.58, mantPct:2.27, tripMes:27600, combAnual:32900, otrosAnual:47700, depPct5:39.8,
+        seguroPct:1.58, mantPct:2.27, tripMes:27600, combAnual:32900, otrosAnual:47700, depPct5:44,
+        // depPct5 44 (banda 39-50): CERO reventas del BGM75 en el mundo — «no boats listed for sale over the
+        // past three years» (YachtBuyer). Inferido del BGX63 monocasco (-42% a 5a) y del estado del stock nuevo:
+        // un dealer oficial rebajó un BGM75 de 2025 un -15.2% (8,764,450€ -> 7,433,556€) y sigue sin venderlo;
+        // el BG74 promedia 437 días en mercado. ⚠ Además: los $9,917,440 están ~15% POR ENCIMA de ese stock
+        // rebajado. Si se paga el pedido sin negociar, la pérdida efectiva a 5 años es ~50, no 44.
         diasUso:120, charterDia:5700, // charter: Kimani/BG74 ~$40k/sem (YCF/Boatcrowd), comparable de gama
         }),
       b("b-gt86","McConaghy MC86GT",83.8,{ precio:8980000, marinaId:"m-hk",
@@ -1000,7 +1009,15 @@ function datosEjemplo(){
         // ⚠ Instalación de 230 V / 50 Hz: tomar corriente de muelle en EE.UU. o México exige convertidor no incluido.
         // Casco de E-glass + Corecell por infusión epóxica (NO de carbono: sólo el volante, el asta y la escalerilla).
         // LOA 25.54 m · manga 9.24 m · 2× Volvo IPS1350 (= D13 de 735 kW c/u, ~1000 hp, no 1350 hp).
-        seguroPct:1.79, mantPct:2.20, tripMes:22800, combAnual:41900, otrosAnual:56100, depPct5:39.8,
+        seguroPct:1.79, mantPct:2.20, tripMes:22800, combAnual:41900, otrosAnual:56100, depPct5:48,
+        // depPct5 48 (banda 40-58): CERO reventas — el MC86GT es primero de serie absoluto, no existe ningún
+        // casco entregado. El perfil de reventa de la marca sí se puede ver: un MC60 de 2019 en Fort Lauderdale
+        // lleva doce meses de recortes, $2,749,000 -> $2,290,000 (-16.7%), y sigue sin venderse. Constructor de
+        // bajo volumen, sin red global de servicio, entrega en Asia (el peor sitio para revender).
+        // ⚠⚠ BANDERA ROJA DE PRECIO, resolver antes de fiarse de esta fila: un MC86 GT nuevo de 2027 se pide a
+        // $14,440,000 y un MC86 OPEN 2026 a $12,440,000, contra los $8,980,000 del Schedule 1. O compran un
+        // 35-40% bajo mercado (y entonces depPct5 baja a ~38), o los $8.98M son casco desnudo y el barco con
+        // spec cuesta $12M+, en cuyo caso el precio NO es homogéneo con los otros dos y la comparación se rompe.
         diasUso:120, charterDia:11400, // charter: interpolación interna bajo el SX88; sin listado de mercado del MC86GT
         }),
     ],
