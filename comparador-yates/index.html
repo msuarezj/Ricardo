@@ -868,7 +868,7 @@ function clamp(v, lo, hi){ return Math.min(hi, Math.max(lo, v)); }
    Todo estado externo (localStorage o import) pasa por
    normalizarEstado(): campos coercionados, ids garantizados.
    ============================================================ */
-const STORE_KEY = "comparador-yates-v8";
+const STORE_KEY = "comparador-yates-v9";
 
 function normalizarEstado(d){
   if (!d || !Array.isArray(d.marinas) || !Array.isArray(d.barcos)) return null;
@@ -948,14 +948,27 @@ function datosEjemplo(){
     barcos: [
       /* Los tres barcos que Ricardo dejó en la mesa (nota de voz del 8/sep/2026): sólo se
          comparan estas embarcaciones. Precios tomados de los documentos que él y Luis Xavier
-         reenviaron el 9/sep/2026. Los costos de operación siguen la convención ITEMIZADA del
-         expediente BKI —seguro 0.9% · mantenimiento puro 2.3% · tripulación 4.15%/año ·
-         combustible 1.286%/año · otros 0.395%/año, todos sobre el precio— y NO la regla de dedo
-         del 10% que engloba todo. Ninguno de esos porcentajes está cotizado para estos cascos:
-         son la metodología del expediente aplicada por analogía, para que las tres filas sean
-         comparables entre sí. Los tres son catamaranes y costoMarinaAnual() cobra únicamente
-         por pie de ESLORA, así que el sobrecosto de amarre multicasco va como extra explícito
-         y editable (1.5× sobre el renglón de marina; estimado, no cotizado).
+         reenviaron el 9/sep/2026. Los costos de operación salen ahora de la
+         INGENIERÍA DE CADA CASCO, no de un porcentaje del precio. El modelo anterior calculaba
+         todos los rubros como el mismo % del precio para los tres barcos (9.031% en total), con lo
+         que el barco más barato ganaba SIEMPRE por aritmética y ningún dato físico del barco
+         entraba en la comparación. Ahora: combustible del consumo real (curva CFD medida en el
+         Sunreef; potencia instalada, desplazamiento y aporte solar en los otros dos), tripulación
+         de las literas realmente documentadas en la configuración COTIZADA —el BGM75 compró
+         «Additional bed in captain's cabin» ($12,960), así que son 4 plazas y no las 3 del
+         catálogo; el MC86GT lleva UN camarote de tripulación, 3 plazas—, mantenimiento de los
+         sistemas que monta cada barco (cascos a carenar, pods, generadores, giroscopios, teca,
+         pintura vs gelcoat, astillero de bajo volumen) y seguro de primas de mercado 2026 por
+         valor asegurado, material de casco y zona.
+         Base común OBLIGATORIA a los tres, o la comparación no significa nada: 150 h/año (100 a
+         crucero económico + 50 a rápido, cada barco a SUS velocidades), generador 1,000 h,
+         diésel $1.25/L, escala salarial única (capitán 9,000 · chef 6,000 · marinero 4,000 ·
+         stew 4,000, +20% de carga) y margen de servicio +10% en los tres.
+         ⚠ PENDIENTE: seguroPct asume PUERTO BASE COMÚN en Florida para los tres, lo que NO
+         concuerda con las marinas asignadas (m-rak / m-ftl / m-hk). Hay que fijar un puerto base
+         único; si pasa a La Paz las primas bajan a 1.47 · 1.35 · 1.52.
+         ⚠ El recargo multicasco de marina se retiró: en Bahia Mar el motor de reservas mete al
+         BGM75 en un solo amarre, y en RAK el 1,5× de catamarán ya va dentro de la tarifa.
          diasUso:120 es un supuesto común a los tres —uso caribeño regular— puesto para que las
          métricas «por día de uso» y «vs charter» funcionen; ajústalo cuando haya plan real. */
       b("b-sun88u","Sunreef 88 Ultima",87.9,{ precio:9995552, marinaId:"m-rak",
@@ -965,7 +978,7 @@ function datosEjemplo(){
         // que los tres tarifarios están en USD. Resuelto — no aplicar conversión.
         // Alternativas del mismo tarifario: upgrade IPS1350 (735 kW c/u) +$683,200 · layout 1.2 (4 guest) $10,285,905.
         // Entrega en EAU, ex-works: sin flete, arancel ni matriculación. Manga 9.10 m plegada / 12.00 m desplegada.
-        seguroPct:0.9, mantPct:2.3, tripMes:34568, combAnual:128543, otrosAnual:39482, depPct5:39.8,
+        seguroPct:1.72, mantPct:1.79, tripMes:27600, combAnual:21900, otrosAnual:56100, depPct5:39.8,
         diasUso:120, charterDia:12300, // charter: banda del SL86A ($86k/sem); no hay listado real del 88 Ultima
         }),
       b("b-bgm75","Bluegame BGM75",74.7,{ precio:9917440, marinaId:"m-ftl",
@@ -976,7 +989,7 @@ function datosEjemplo(){
         // estricta del monto, remitiendo cualquier cita externa al precio de lista. Por eso la tabla usa la lista.
         // Sustituye el 10,850,000 que traía la semilla (precio público s/Ricardo, chat 1/jul), sin documento.
         // Multicasco «estrecho»: manga 8.15 m — el recargo de marina puede ser menor que en los otros dos.
-        seguroPct:0.9, mantPct:2.3, tripMes:34298, combAnual:127538, otrosAnual:39174, depPct5:39.8,
+        seguroPct:1.58, mantPct:2.27, tripMes:27600, combAnual:32900, otrosAnual:47700, depPct5:39.8,
         diasUso:120, charterDia:5700, // charter: Kimani/BG74 ~$40k/sem (YCF/Boatcrowd), comparable de gama
         }),
       b("b-gt86","McConaghy MC86GT",83.8,{ precio:8980000, marinaId:"m-hk",
@@ -987,7 +1000,7 @@ function datosEjemplo(){
         // ⚠ Instalación de 230 V / 50 Hz: tomar corriente de muelle en EE.UU. o México exige convertidor no incluido.
         // Casco de E-glass + Corecell por infusión epóxica (NO de carbono: sólo el volante, el asta y la escalerilla).
         // LOA 25.54 m · manga 9.24 m · 2× Volvo IPS1350 (= D13 de 735 kW c/u, ~1000 hp, no 1350 hp).
-        seguroPct:0.9, mantPct:2.3, tripMes:31056, combAnual:115483, otrosAnual:35471, depPct5:39.8,
+        seguroPct:1.79, mantPct:2.20, tripMes:22800, combAnual:41900, otrosAnual:56100, depPct5:39.8,
         diasUso:120, charterDia:11400, // charter: interpolación interna bajo el SX88; sin listado de mercado del MC86GT
         }),
     ],
