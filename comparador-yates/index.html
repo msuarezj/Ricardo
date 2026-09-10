@@ -868,7 +868,7 @@ function clamp(v, lo, hi){ return Math.min(hi, Math.max(lo, v)); }
    Todo estado externo (localStorage o import) pasa por
    normalizarEstado(): campos coercionados, ids garantizados.
    ============================================================ */
-const STORE_KEY = "comparador-yates-v7";
+const STORE_KEY = "comparador-yates-v8";
 
 function normalizarEstado(d){
   if (!d || !Array.isArray(d.marinas) || !Array.isArray(d.barcos)) return null;
@@ -930,9 +930,12 @@ function datosEjemplo(){
       { id:"m-prom",  nombre:"Marina promedio",  ubic:"Referencia general de Ricardo", unidad:"dia", tarifaAlta:4.00, tarifaBaja:1.35, mesesAlta:6, extrasMes:0 },
       { id:"m-lapaz", nombre:"Marina CostaBaja", ubic:"La Paz, BCS · tarifa oficial $63–79/ft/mes según eslora, todo el año, + IVA", unidad:"mes", tarifaAlta:65, tarifaBaja:65, mesesAlta:6, extrasMes:0 },
       { id:"m-cabo",  nombre:"IGY Marina Cabo San Lucas", ubic:"Cabo San Lucas, BCS · solo bajo cotización (CSL@IGYMarinas.com)", unidad:"dia", tarifaAlta:0, tarifaBaja:0, mesesAlta:7, extrasMes:0 },
-      { id:"m-ftl",   nombre:"Bahia Mar Yachting Center", ubic:"Fort Lauderdale, FL · tarifa transitoria oficial; anual por cotización; + 7% tax y luz", unidad:"dia", tarifaAlta:7.50, tarifaBaja:4.65, mesesAlta:7, extrasMes:0 },
+      { id:"m-ftl",   nombre:"Bahia Mar Yachting Center", ubic:"Fort Lauderdale, FL · TRANSITORIA (por noche), no anual — Bahia Mar no publica contrato anual. Tramo 70'–79' = $4.05/ft/día (motor Molo, verificado sep-2026). Tramos: 45–59 $3.20 · 60–69 $3.80 · 70–79 $4.05 · 80–99 $4.65 · 110–124 $4.90. + 7% tax de Broward + luz. Sin recargo multicasco: el BGM75 cabe en un amarre (manga 26.6 ft vs ~42 ft de tope)", unidad:"dia", tarifaAlta:4.05, tarifaBaja:4.05, mesesAlta:0, extrasMes:1050 },
       { id:"m-miami", nombre:"Miami Beach Marina", ubic:"Miami Beach, FL · solo bajo cotización (305-673-6000)", unidad:"dia", tarifaAlta:0, tarifaBaja:0, mesesAlta:5, extrasMes:0 },
       { id:"m-vallarta", nombre:"Marina Riviera Nayarit (La Cruz)", ubic:"Bahía de Banderas, Nay. · tarifario 2025-26 banda 91'+, + 16% IVA", unidad:"dia", tarifaAlta:1.98, tarifaBaja:0.71, mesesAlta:7, extrasMes:0 },
+      /* Añadidas 9/sep/2026 tras la nota de Ricardo «MC EN CHINA · SANLORENZO EN FORTLAUREDALE · SUNREEF EN EMIRATOS». */
+      { id:"m-hk",    nombre:"RHKYC · boya Causeway Bay", ubic:"Hong Kong · ⚠ NO ES UN AMARRE, es BOYA DE FONDEO. Único tarifario público de HK que llega a 25.5 m: Royal Hong Kong Yacht Club «Marine Fees» vig. 1-ago-2026, banda 25M–27M = HK$9,255/mes ÷ 83.79 ft ÷ 7.84 = $14.09/ft/mes. HK no tiene IVA. Sin recargo multicasco (en boya la manga no restringe). ⚠ El club declara todas las boyas ocupadas, no las da a no-socios y la lista de espera ronda 5 años; exige membresía (alta ~HK$91,800). Lantau Yacht Club es la única marina de pantalán de HK que admite 9.3 m de manga y NO publica tarifa (membresía por invitación)", unidad:"mes", tarifaAlta:14.09, tarifaBaja:14.09, mesesAlta:0, extrasMes:272 },
+      { id:"m-rak",   nombre:"Royal Yacht Club RAK (Al Hamra)", ubic:"Ras Al Khaimah, EAU · tarifario público 2025, banda 79–98 ft = AED 53/ft/mes contrato 12m, IVA 5% YA incluido; × 1,5 por catamarán = AED 79.50 = $21.65/ft/mes. ⚠ La cláusula del 1,5× es verbatim pero sale de un PDF de 2023 que la marina ya no enlaza — reconfirmar. ⚠ Manga máxima NO publicada; el Sunreef mide 9.10 m plegado y 12.00 m desplegado (lista de precios), así que puede exigir cabecera y saltar de banda. Alternativa más barata: Yas Marina Abu Dabi, 27 m a 51 semanas = AED 67,909/año ≈ $18,491, sólo por eslora y sin multiplicador de catamarán", unidad:"mes", tarifaAlta:21.65, tarifaBaja:21.65, mesesAlta:0, extrasMes:32 },
     ],
     bancos: [
       /* Opciones de financiamiento. La primera es el escenario del memorándum de crédito de
@@ -955,7 +958,7 @@ function datosEjemplo(){
          y editable (1.5× sobre el renglón de marina; estimado, no cotizado).
          diasUso:120 es un supuesto común a los tres —uso caribeño regular— puesto para que las
          métricas «por día de uso» y «vs charter» funcionen; ajústalo cuando haya plan real. */
-      b("b-sun88u","Sunreef 88 Ultima",87.9,{ precio:9995552, marinaId:"m-ftl",
+      b("b-sun88u","Sunreef 88 Ultima",87.9,{ precio:9995552, marinaId:"m-rak",
         // precio: lista oficial «Sunreef 88 ULTIMA Price List 2026», opción 1.1 (master + 3 guest + 3 crew)
         // con los motores STD que declara la propia cabecera (2× Volvo D13-IPS1050).
         // ⚠ La lista NO declara moneda en NINGUNA línea: el «USD» viene sólo del nombre del archivo. Confirmar.
@@ -963,7 +966,7 @@ function datosEjemplo(){
         // Entrega en EAU, ex-works: sin flete, arancel ni matriculación. Manga 9.10 m plegada / 12.00 m desplegada.
         seguroPct:0.9, mantPct:2.3, tripMes:34568, combAnual:128543, otrosAnual:39482, depPct5:39.8,
         diasUso:120, charterDia:12300, // charter: banda del SL86A ($86k/sem); no hay listado real del 88 Ultima
-        extras:[{ nombre:"Recargo multicasco marina (1.5×, estimado)", monto:101274, periodo:"año" }] }),
+        }),
       b("b-bgm75","Bluegame BGM75",74.7,{ precio:9917440, marinaId:"m-ftl",
         // precio: YATE CONFIGURADO del «BGM75 PRICELIST 2024A» rev. 2/nov/2025 = 7,600,000 base
         // + 2,317,440 en opcionales (49 partidas, suma verificada). Ex-fábrica Ameglia, sin flete ni aranceles.
@@ -974,8 +977,8 @@ function datosEjemplo(){
         // Multicasco «estrecho»: manga 8.15 m — el recargo de marina puede ser menor que en los otros dos.
         seguroPct:0.9, mantPct:2.3, tripMes:34298, combAnual:127538, otrosAnual:39174, depPct5:39.8,
         diasUso:120, charterDia:5700, // charter: Kimani/BG74 ~$40k/sem (YCF/Boatcrowd), comparable de gama
-        extras:[{ nombre:"Recargo multicasco marina (1.5×, estimado)", monto:86066, periodo:"año" }] }),
-      b("b-gt86","McConaghy MC86GT",83.8,{ precio:8980000, marinaId:"m-ftl",
+        }),
+      b("b-gt86","McConaghy MC86GT",83.8,{ precio:8980000, marinaId:"m-hk",
         // precio: «Schedule 1 — Specifications, Pricing and Options» rev.8 del 9/sep/2025 (la revisión y la fecha
         // vienen del nombre del PDF; el encabezado interno sólo dice «Sept 2025»): USD 8,980,000 ENTREGADO EN HONG KONG.
         // ⚠ No incluye flete/importación a destino, ni tender, toys y equipo de seguridad (owner supply, L748).
@@ -985,7 +988,7 @@ function datosEjemplo(){
         // LOA 25.54 m · manga 9.24 m · 2× Volvo IPS1350 (= D13 de 735 kW c/u, ~1000 hp, no 1350 hp).
         seguroPct:0.9, mantPct:2.3, tripMes:31056, combAnual:115483, otrosAnual:35471, depPct5:39.8,
         diasUso:120, charterDia:11400, // charter: interpolación interna bajo el SX88; sin listado de mercado del MC86GT
-        extras:[{ nombre:"Recargo multicasco marina (1.5×, estimado)", monto:96550, periodo:"año" }] }),
+        }),
     ],
     marinaSel: "__asig",
     criterio: "total",
